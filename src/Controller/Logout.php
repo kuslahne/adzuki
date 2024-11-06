@@ -31,7 +31,7 @@ class Logout implements ControllerInterface
         if (isset($_SESSION["username"])) {
             $this->logger->info(sprintf("Logout user %s", $_SESSION["username"]));
         }
-        if (session_status() == PHP_SESSION_ACTIVE) {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
             session_destroy();
             session_unset();
             session_regenerate_id(true);
