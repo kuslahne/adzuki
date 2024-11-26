@@ -15,9 +15,16 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use App\Model\Db;
+
+
+require 'lib/rb-sqlite.php';
+$c = require 'config.php';
+$db = new Db($c['database']['pdo_dsn']);
+
 
 return [
-    'config' => require 'config.php',
+    'config' => $c,
     PDO::class => function(ContainerInterface $c) {
         try {
             return new PDO($c->get('config')['database']['pdo_dsn']);

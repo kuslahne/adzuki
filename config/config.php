@@ -19,7 +19,7 @@ return [
         'cache' => 'data/cache/route.cache'
     ],
     'database' => [
-        'pdo_dsn' => 'sqlite:data/db.sqlite',
+        'pdo_dsn' => 'sqlite:data/app.sqlite',
     ],
     'view' => [
         'path' => 'src/View',

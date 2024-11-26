@@ -4,3 +4,7 @@
     <h1 align="center">Hi <?= $this->e($name) ?>!</h1>
     <p align="center">Change the name in the URL, eg. <b>/hello/foo</b></p>
 </main>
+    <script>
+        let d = new Date();
+        alert("Today's date is " + d);
+    </script>

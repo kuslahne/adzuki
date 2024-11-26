@@ -33,6 +33,12 @@ class Route
             [ 'POST', '/admin/users/{id}', [Controller\AuthSession::class, Admin\Users\Update::class]],
             [ 'POST', '/admin/users', [Controller\AuthSession::class, Admin\Users\Create::class]],
             [ 'DELETE', '/admin/users/{id}', [Controller\AuthSession::class, Admin\Users\Delete::class]],
+            
+            [ 'GET', '/admin/posts[/{id}]', [Controller\AuthSession::class, Admin\Posts\Read::class]],
+			[ 'POST', '/admin/posts', [Controller\AuthSession::class, Admin\Posts\Create::class]],
+			[ 'POST', '/admin/posts/{id}', [Controller\AuthSession::class, Admin\Posts\Update::class]],
+			[ 'DELETE', '/admin/posts/{id}', [Controller\AuthSession::class, Admin\Posts\Delete::class]],
+	    //[ 'GET', '/admin/seed', [Controller\AuthSession::class, Admin\Posts\Read::class]],
         ];
     }
 }
