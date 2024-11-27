@@ -1,14 +1,13 @@
-<?php $this->layout('admin::admin-layout', ['title' => 'Admin - Posts', 'page' => $page]) ?>
+<?php $this->layout('admin::admin-layout', ['title' => 'Admin - Categories', 'page' => $page]) ?>
 
-<h2>Posts <form action="/admin/posts" method="POST" style="float:right">
-<button type="submit" class="btn btn-primary"><i class="bi bi-person-plus"></i> Add post</button></form></h2>
+<h2>Categories <form action="/admin/categories" method="POST" style="float:right">
+<button type="submit" class="btn btn-primary"><i class="bi bi-person-plus"></i> Add category</button></form></h2>
 <table class="table table-hover">
   <thead>
     <tr>
       <th scope="col">#</th>
-      <th scope="col">Title</th>
-      <th scope="col">Content</th>
-      <th scope="col">Published</th>
+      <th scope="col">Name</th>
+      <th scope="col">Description</th>
       <th scope="col"></th>
     </tr>
   </thead>
@@ -17,18 +16,17 @@
       $i = $start;
       $zero = strlen($total);
     ?>
-    <?php foreach($posts as $post): ?>
+    <?php foreach($categories as $category): ?>
     <tr>
       <td><?= sprintf("%0{$zero}d", ++$i)?></td>
-      <td><?= $this->e($post->title)?></td>
-      <td><?= $this->e($post->content)?></td>
-      <td><?= $post->published > 0 ? '<i class="bi bi-check text-success"></i>' : '<i class="bi bi-x text-danger"></i>'?></td>      
+      <td><?= $this->e($category->name)?></td>
+      <td><?= $this->e($category->description)?></td>
       <td>
       
-        <a href="/admin/posts/<?= $this->e($post->id) ?>" class="no-underline">
+        <a href="/admin/categories/<?= $this->e($category->id) ?>" class="no-underline">
           <i class="bi bi-pencil-square"></i> Edit
         </a> - 
-        <a href="#" data-bs-toggle="modal" data-bs-target="#confirmModal" class="no-underline" data-title="<?= $this->e($post->title)?>" data-id="<?= $this->e($post->id)?>">
+        <a href="#" data-bs-toggle="modal" data-bs-target="#confirmModal" class="no-underline" data-title="<?= $this->e($category->name)?>" data-id="<?= $this->e($category->id)?>">
           <i class="bi bi-trash"></i> Delete
         </a>
       </td>
@@ -37,7 +35,7 @@
   </tbody>
 </table>
 <div class="row">
-  <p>Total number of posts: <strong><?= $this->e($total)?></strong></p>
+  <p>Total number of categories: <strong><?= $this->e($total)?></strong></p>
 </div>
 <nav aria-label="Page navigation">
   <ul class="pagination justify-content-center">
@@ -45,7 +43,7 @@
       'start'    => $start, 
       'size'     => $size, 
       'total'    => $total,
-      'url'      => '/admin/posts',
+      'url'      => '/admin/categories',
       'numItems' => 5
     ]); ?>
   </ul>
@@ -59,7 +57,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        Are you sure to delete post `<span id="title"></span>`?<br />
+        Are you sure to delete category `<span id="name"></span>`?<br />
         Please note, this action cannot be undone.
       </div>
       <div class="modal-footer">
@@ -78,14 +76,14 @@
   confirmModal.addEventListener('show.bs.modal', function (e) {
     document.getElementById('deleteError').style.visibility = "hidden"
     document.getElementById('confirmDelete').disabled = false
-    document.getElementById('title').innerHTML = e.relatedTarget.attributes['data-title'].value;
+    document.getElementById('name').innerHTML = e.relatedTarget.attributes['data-name'].value;
     document.getElementById('confirmDelete').setAttribute('data-id', e.relatedTarget.attributes['data-id'].value)
   })
 
   var confirmDelete = document.getElementById('confirmDelete')
   confirmDelete.addEventListener('click', function(e) {
     var xhr = new XMLHttpRequest()
-    xhr.open('DELETE', '/admin/posts/' + e.target.attributes['data-id'].value)
+    xhr.open('DELETE', '/admin/categories/' + e.target.attributes['data-id'].value)
     xhr.onload = function () {
       if (xhr.readyState == 4 && xhr.status == "200") {
         location.reload()

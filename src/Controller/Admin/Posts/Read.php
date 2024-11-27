@@ -46,9 +46,9 @@ class Read implements ControllerInterface
                 $this->plates->render('admin::posts', [
                     'start' => $start,
                     'size' => $size,
-		    //'table' => $this->posts->createTable(),
                     'total' => $this->posts->getTotalPosts(),
-                    'posts' => $this->posts->getAll($start, $size)
+                    'posts' => $this->posts->getAll($start, $size),
+					'page'	=>  'posts'
                 ])
             );
         }

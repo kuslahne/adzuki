@@ -1,7 +1,4 @@
 <?php $this->layout('admin::admin-layout', ['title' => 'Admin - Edit Post']) ?>
-<?php 
-	//var_dump($post); exit;
-?>
 <h2>Edit Post</h2>
 <form action="/admin/posts/<?= $this->e($post->id)?>" id="postForm" method="POST">
   <?php if(isset($error)): ?>

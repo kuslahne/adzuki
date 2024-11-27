@@ -33,11 +33,18 @@ class Route
             [ 'POST', '/admin/users/{id}', [Controller\AuthSession::class, Admin\Users\Update::class]],
             [ 'POST', '/admin/users', [Controller\AuthSession::class, Admin\Users\Create::class]],
             [ 'DELETE', '/admin/users/{id}', [Controller\AuthSession::class, Admin\Users\Delete::class]],
-            
-            [ 'GET', '/admin/posts[/{id}]', [Controller\AuthSession::class, Admin\Posts\Read::class]],
+                        
 			[ 'POST', '/admin/posts', [Controller\AuthSession::class, Admin\Posts\Create::class]],
+			[ 'GET', '/admin/posts[/{id}]', [Controller\AuthSession::class, Admin\Posts\Read::class]],
 			[ 'POST', '/admin/posts/{id}', [Controller\AuthSession::class, Admin\Posts\Update::class]],
 			[ 'DELETE', '/admin/posts/{id}', [Controller\AuthSession::class, Admin\Posts\Delete::class]],
+			
+			[ 'POST', '/admin/categories', [Controller\AuthSession::class, Admin\Categories\Create::class]],
+			[ 'GET', '/admin/categories[/{id}]', [Controller\AuthSession::class, Admin\Categories\Read::class]],
+			[ 'POST', '/admin/categories/{id}', [Controller\AuthSession::class, Admin\Categories\Update::class]],
+			[ 'DELETE', '/admin/categories/{id}', [Controller\AuthSession::class, Admin\Categories\Delete::class]],
+			
+			
 	    //[ 'GET', '/admin/seed', [Controller\AuthSession::class, Admin\Posts\Read::class]],
         ];
     }

@@ -1,4 +1,4 @@
-<?php $this->layout('admin::admin-layout', ['title' => 'Admin - Users']) ?>
+<?php $this->layout('admin::admin-layout', ['title' => 'Admin - Users', 'page' => $page]) ?>
 
 <h2>Users <form action="/admin/users" method="POST" style="float:right"><button type="submit" class="btn btn-primary"><i class="bi bi-person-plus"></i> Add user</button></form></h2>
 <table class="table table-hover">

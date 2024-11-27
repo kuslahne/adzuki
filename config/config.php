@@ -11,7 +11,9 @@ declare(strict_types=1);
 use App\Config\Route;
 use Monolog\Logger;
 use Psr\Container\ContainerInterface;
+use Tracy\Debugger;
 
+Debugger::enable();
 
 return [
     'routing' => [

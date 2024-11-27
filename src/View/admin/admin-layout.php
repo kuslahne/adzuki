@@ -30,13 +30,17 @@
         <div class="position-sticky pt-3">
             <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/admin/users">
+                <a class="nav-link <?php echo ($this->e($page) == "users" ? "active" : "")?>" <?php echo ($page == "users" ? "aria-current='page'" : "")?> href="/admin/users">
                 <span data-feather="home"></span>
                 Users
                 </a>
-                <a class="nav-link active" aria-current="page" href="/admin/posts">
+                <a class="nav-link <?php echo ($this->e($page) == "posts" ? "active" : "")?>" <?php echo ($page == "posts" ? "aria-current='page'" : "")?> href="/admin/posts">
                 <span data-feather="posts"></span>
                 Posts
+                </a>
+                <a class="nav-link <?php echo ($this->e($page) == "categories" ? "active" : "")?>" <?php echo ($page == "categories" ? "aria-current='page'" : "")?> href="/admin/categories">
+                <span data-feather="categories"></span>
+                Categories
                 </a>
             </li>
             </ul>
