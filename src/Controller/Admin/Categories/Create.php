@@ -8,12 +8,12 @@
  */
 declare(strict_types=1);
 
- namespace App\Controller\Admin\Posts;
+ namespace App\Controller\Admin\Categories;
 
 use App\Config\Route;
 use App\Exception\DatabaseException;
-use App\Model\Post;
-use App\Service\Posts;
+use App\Model\Category;
+use App\Service\Categories;
 use League\Plates\Engine;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
@@ -23,50 +23,51 @@ use SimpleMVC\Controller\ControllerInterface;
 class Create implements ControllerInterface
 {
     protected Engine $plates;
-    protected Posts $posts;
+    protected Categories $categories;
 
-    public function __construct(Engine $plates, Posts $posts)
+    public function __construct(Engine $plates, Categories $categories)
     {
         $this->plates = $plates;
-        $this->posts = $posts;
+        $this->categories = $categories;
     }
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $params = $request->getParsedBody();
-        // If no POST params just render new-post view
+
+        // If no POST params just render new-category view
         if (empty($params)) {
             return new Response(
                 200,
                 [],
-                $this->plates->render('admin::new-post', ['page'	=>  'posts'])
+                $this->plates->render('admin::new-category', ['page'	=>  'categories'])
             );
         }
 
-        $title = $params['title'] ?? '';
-        $content = $params['content'] ?? '';
-        $published = $params['published'] ?? 0;
+        $name = $params['name'] ?? '';
+        $description = $params['description'] ?? '';
+        $metaDescription = (string)$params['meta_description'] ?? '';
         
-        $errors = $this->validateParams($title, $content);
+        $errors = $this->validateParams($name, $description);
         if (!empty($errors)) {
             return new Response(
                 400,
                 [],
-                $this->plates->render('admin::new-post', array_merge($errors, [
-                    'title' => $title,
-                    'page' => 'posts'
+                $this->plates->render('admin::new-category', array_merge($errors, [
+                    'name' => $name,
+                    'page'	=>  'categories'
                 ]))
             );
         }
 
         try {
-            $this->posts->create($title, $content, $published);
+            $this->categories->create($name, $description, $metaDescription);
             return new Response(
                 201,
                 [],
-                $this->plates->render('admin::new-post', [
-                    'result' => sprintf("The post %s has been successfully created!", $title),
-                    'page' => 'posts'
+                $this->plates->render('admin::new-category', [
+                    'result' => sprintf("The category %s has been successfully created!", $name),
+                    'page'	=>  'categories'
                 ])
             );
         } catch (DatabaseException $e) {
@@ -74,8 +75,8 @@ class Create implements ControllerInterface
             return new Response(
                 500,
                 [],
-                $this->plates->render('admin::new-post', [
-                    'error' => 'Error adding the post, please contact the administrator'
+                $this->plates->render('admin::new-category', [
+                    'error' => 'Error adding the category, please contact the administrator'
                 ])
             ); 
         }
@@ -84,33 +85,33 @@ class Create implements ControllerInterface
     /**
      * @return array<string, array<string, string>>
      */
-    private function validateParams(string $title, string $content): array
+    private function validateParams(string $name, string $description): array
     {
-        if (empty($title)) {
+        if (empty($name)) {
             return [
                 'formErrors' => [
-                    'title' => 'The title cannot be empty'
+                    'name' => 'The name cannot be empty'
                 ]
             ];
         }
-        if (empty($content)) {
+        if (empty($description)) {
             return [
                 'formErrors' => [
-                    'content' => 'The content cannot be empty'
+                    'description' => 'The description cannot be empty'
                 ]
             ];
         }
-        if ($this->posts->exists($title)) {
+        if ($this->categories->exists($name)) {
             return [
                 'formErrors' => [
-                    'title' => 'The title already exists!'
+                    'name' => 'The name already exists!'
                 ]
             ];
         }
-        if (strlen($content) < Post::MIN_CONTENT_LENGTH) {
+        if (strlen($description) < Category::MIN_CONTENT_LENGTH) {
             return [
                 'formErrors' => [
-                    'content' => sprintf("The content must be at least %d characters long", Post::MIN_CONTENT_LENGTH)
+                    'description' => sprintf("The description must be at least %d characters long", Category::MIN_CONTENT_LENGTH)
                 ]
             ];
         }

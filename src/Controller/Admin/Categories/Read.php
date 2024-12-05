@@ -58,7 +58,8 @@ class Read implements ControllerInterface
                 200,
                 [],
                 $this->plates->render('admin::edit-category', [
-                    'category' => $category
+                    'category' => $category,
+                    'page'	=>  'categories'
                 ])
             );
         } catch (DatabaseException $e) {

@@ -1,4 +1,4 @@
-<?php $this->layout('admin::admin-layout', ['title' => 'Admin - Edit Post']) ?>
+<?php $this->layout('admin::admin-layout', ['title' => 'Admin - Edit Post', 'page' => $page]) ?>
 <h2>Edit Post</h2>
 <form action="/admin/posts/<?= $this->e($post->id)?>" id="postForm" method="POST">
   <?php if(isset($error)): ?>

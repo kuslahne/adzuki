@@ -26,7 +26,7 @@
         <a href="/admin/categories/<?= $this->e($category->id) ?>" class="no-underline">
           <i class="bi bi-pencil-square"></i> Edit
         </a> - 
-        <a href="#" data-bs-toggle="modal" data-bs-target="#confirmModal" class="no-underline" data-title="<?= $this->e($category->name)?>" data-id="<?= $this->e($category->id)?>">
+        <a href="#" data-bs-toggle="modal" data-bs-target="#confirmModal" class="no-underline" data-name="<?= $this->e($category->name)?>" data-id="<?= $this->e($category->id)?>">
           <i class="bi bi-trash"></i> Delete
         </a>
       </td>
@@ -57,7 +57,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        Are you sure to delete category `<span id="name"></span>`?<br />
+        Are you sure to delete category `<span id="name"><?= $this->e($category->name)?></span>`?<br />
         Please note, this action cannot be undone.
       </div>
       <div class="modal-footer">

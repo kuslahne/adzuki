@@ -48,7 +48,7 @@ class Read implements ControllerInterface
                     'size' => $size,
                     'total' => $this->posts->getTotalPosts(),
                     'posts' => $this->posts->getAll($start, $size),
-					'page'	=>  'posts'
+					'page'	=> 'posts'
                 ])
             );
         }
@@ -58,7 +58,8 @@ class Read implements ControllerInterface
                 200,
                 [],
                 $this->plates->render('admin::edit-post', [
-                    'post' => $post
+                    'post' => $post,
+                    'page'	=> 'posts'
                 ])
             );
         } catch (DatabaseException $e) {

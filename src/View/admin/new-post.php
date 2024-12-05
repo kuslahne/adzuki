@@ -1,4 +1,4 @@
-<?php $this->layout('admin::admin-layout', ['title' => 'Admin - New Post']) ?>
+<?php $this->layout('admin::admin-layout', ['title' => 'Admin - New Post', 'page' => $page]) ?>
 
 <h2>New Post</h2>
 <form action="/admin/posts" id="postForm" method="POST">
@@ -65,8 +65,10 @@
 		method: "POST",
 		body: formData,
 	  })
-		.then((response) => console.log(response))
-		.catch((error) => console.error(error));
+	  .then( function(response) {
+				window.location.href = '/admin/posts';
+				console.log(response);
+			}).catch((error) => console.error(error));
 	});
 </script>
 <?php $this->end() ?>

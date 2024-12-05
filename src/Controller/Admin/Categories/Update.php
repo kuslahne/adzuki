@@ -8,12 +8,12 @@
  */
 declare(strict_types=1);
 
-namespace App\Controller\Admin\Posts;
+namespace App\Controller\Admin\Categories;
 
 use App\Config\Route;
 use App\Exception\DatabaseException;
-use App\Model\Post;
-use App\Service\Posts as ServicePosts;
+use App\Model\Category;
+use App\Service\Categories as ServiceCategories;
 use League\Plates\Engine;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
@@ -23,12 +23,12 @@ use SimpleMVC\Controller\ControllerInterface;
 class Update implements ControllerInterface
 {
     protected Engine $plates;
-    protected ServicePosts $posts;
+    protected ServiceCategories $categories;
 
-    public function __construct(Engine $plates, ServicePosts $posts)
+    public function __construct(Engine $plates, ServiceCategories $categories)
     {
         $this->plates = $plates;
-        $this->posts = $posts;
+        $this->categories = $categories;
     }
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -36,31 +36,34 @@ class Update implements ControllerInterface
         $id = (int) $request->getAttribute('id');
         $params = $request->getParsedBody();
 
-        $post = $this->posts->get($id);
-        $title = $params['title'] ?? '';
-        $content = $params['content'] ?? '';
-        $published = (int)$params['published'];
-        //var_dump($params); exit;
+        $category = $this->categories->get($id);
+        $name = $params['name'] ?? '';
+        $description = $params['description'] ?? '';
+        $metaDescription = (string)$params['meta_description'];
         
-        $errors = $this->checkParams($title, $content);
+       
+        $errors = $this->checkParams($name, $description);
+        
         if (!empty($errors)) {
             return new Response(
                 400,
                 [],
-                $this->plates->render('admin::edit-post', array_merge($errors, [
-                    'post' => $post
+                $this->plates->render('admin::edit-category', array_merge($errors, [
+                    'category' => $category,
+                    'page'	=>  'categories'
                 ]))
             );
         }
 
         try {
-            $this->posts->update($id, $published, $title, $content);
+            $this->categories->update($id, $metaDescription, $name, $description);
             return new Response(
                 200,
                 [],
-                $this->plates->render('admin::edit-post', [
-                    'result' => sprintf("The post %s has been successfully updated!", $post->title),
-                    'post' => $post
+                $this->plates->render('admin::edit-category', [
+                    'result' => sprintf("The category %s has been successfully updated!", $category->name),
+                    'category' => $category,
+                    'page'	=>  'categories'
                 ])
             );
         } catch (DatabaseException $e) {
@@ -68,9 +71,9 @@ class Update implements ControllerInterface
             return new Response(
                 500,
                 [],
-                $this->plates->render('admin::edit-post', [
-                    'error' => 'Error updating the post, please contact the administrator',
-                    'post' => $post
+                $this->plates->render('admin::edit-category', [
+                    'error' => 'Error updating the category, please contact the administrator',
+                    'category' => $category
                 ])
             );
         }
@@ -81,12 +84,12 @@ class Update implements ControllerInterface
      * 
      * @return array<string, array<string, string>>
      */
-    private function checkParams(string $title, string $content): array
+    private function checkParams(string $name, string $description): array
     {
-        if (empty($content)) {
+        if (empty($description)) {
             return [];
         }
-        if (strlen($content) < Post::MIN_CONTENT_LENGTH) {
+        if (strlen($description) < Category::MIN_CONTENT_LENGTH) {
             return [
                 'formErrors' => [
                     'content' => 'The content must be at least 10 characters long'

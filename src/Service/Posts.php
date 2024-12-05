@@ -58,21 +58,23 @@ class Posts
         if (!$posts) {
             return false;
         }
-        return $posts;
+        return true;
     }
 
     /**
      * Create a new post
      * @throws DatabaseException
      */
-    public function create(string $title, string $content, int $published): void
+    public function create(string $title, string $content, int $published): int
     {	
-		$is_published = $published?: 1;
+		$is_published = $published ?: 1;
 		$post = R::dispense( 'posts' );
 		$post->title = $title;
 		$post->content = $content;
 		$post->published = $is_published;
         $id = R::store( $post );
+        
+        return (int)$id;
     }
     
     public function createTable(): void
