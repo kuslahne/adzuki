@@ -16,3 +16,7 @@ VALUES
     -- posts definition
 
 CREATE TABLE `posts` ( id INTEGER PRIMARY KEY AUTOINCREMENT , `title` TEXT, `content` TEXT, "published" INTEGER DEFAULT 1 NOT NULL);
+
+    -- categories definition
+
+CREATE TABLE `categories` ( `id` INTEGER PRIMARY KEY AUTOINCREMENT  ,`name` TEXT ,`description` TEXT ,`meta_description` TEXT    );
