@@ -48,24 +48,15 @@ class Update implements ControllerInterface
         $name = $params['name'] ?? '';
         $description = $params['description'] ?? '';
         $metaDescription = (string)$params['meta_description'];
-        
        
         $errors = $this->checkParams($name, $description);
         
         if (!empty($errors)) {
-			$this->flash->warning('There was an error!');
-			//$output = $this->flash->display();
-			$output = $this->flash;
+			$output = $this->flash->display();
 
-			$model = [
-						"name" => "Yolo Baggins",
-						"title" => "I'm Title"
-					];
             return new Response(
                 400,
                 [],
-                //return $errors
-                //$this->handlebars->render("main", $model)
                 $this->plates->render('admin::edit-category', array_merge($errors, [
                     'category' => $category,
                     'page'	=>  'categories',
@@ -105,21 +96,21 @@ class Update implements ControllerInterface
      */
     private function checkParams(string $name, string $description): array
     {
+		if ($this->categories->exists($name)){
+			return ['formErrors' => [
+                    'name' => 'Category already exists!'
+                ] 
+			];
+		}
         if (empty($description)) {
             return [];
         }
         if (strlen($description) < Category::MIN_CONTENT_LENGTH) {
-			$this->flash->error('The content must be at least 50 characters long!');
 			return [
                 'formErrors' => [
                     'description' => 'The content must be at least 50 characters long'
-                ]
+                ] 
             ];
-            //return [
-                //'formErrors' => [
-                    //'description' => 'The content must be at least 50 characters long'
-                //]
-            //];
         }
         return [];
     }

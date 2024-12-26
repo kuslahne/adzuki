@@ -39,11 +39,7 @@ class Read implements ControllerInterface
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-		// Instance
-		//$flash = new Flash();
-		$this->flash->message('Black Tea.');
-		// Rendering all flash
-		//$output = $this->flash->display();
+		$output = $this->flash->display();
         $id = $request->getAttribute('id', null);
         if (empty($id)) {
             $params = $request->getQueryParams();

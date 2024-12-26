@@ -31,7 +31,6 @@ class Home implements ControllerInterface
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-		$this->flash->message('Ginger Tea.');
         return new Response(
             200,
             [],

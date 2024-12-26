@@ -59,11 +59,11 @@ class Categories
      */
     public function exists(string $categoryName): bool
     {
-		$categories  = R::find( 'categories', ' title LIKE ? ', [ '%'. $categoryName .'%' ] );
+		$categories  = R::find( 'categories', ' name = ? ', [$categoryName] );
         if (!$categories) {
             return false;
         }
-        return $categories;
+        return true;
     }
 
     /**
