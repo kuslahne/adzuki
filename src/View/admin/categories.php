@@ -1,5 +1,4 @@
 <?php $this->layout('admin::admin-layout', ['title' => 'Admin - Categories', 'page' => $page]) ?>
-
 <h2>Categories <form action="/admin/categories" method="POST" style="float:right">
 <button type="submit" class="btn btn-primary"><i class="bi bi-person-plus"></i> Add category</button></form></h2>
 <table class="table table-hover">

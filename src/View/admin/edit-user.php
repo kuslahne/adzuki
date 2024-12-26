@@ -1,8 +1,8 @@
-<?php $this->layout('admin::admin-layout', ['title' => 'Admin - Edit User']) ?>
+<?php $this->layout('admin::admin-layout', ['title' => 'Admin - Edit User', 'page'	=>  $page]) ?>
 
 <h2>Edit User</h2>
 <form action="/admin/users/<?= $this->e($user->id)?>" method="POST">
-  <?php if(isset($error)): ?>
+  <?php if(isset($errors)): ?>
     <div class="mb-3">
       <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <?= $this->e($error)?>

@@ -47,7 +47,8 @@ class Update implements ControllerInterface
                 400,
                 [],
                 $this->plates->render('admin::edit-user', array_merge($errors, [
-                    'user' => $user
+                    'user' => $user,
+                    'page'	=>  'users'
                 ]))
             );
         }
@@ -59,7 +60,8 @@ class Update implements ControllerInterface
                 [],
                 $this->plates->render('admin::edit-user', [
                     'result' => sprintf("The user %s has been successfully updated!", $user->username),
-                    'user' => $user
+                    'user' => $user,
+                    'page'	=>  'users'
                 ])
             );
         } catch (DatabaseException $e) {
@@ -69,7 +71,8 @@ class Update implements ControllerInterface
                 [],
                 $this->plates->render('admin::edit-user', [
                     'error' => 'Error updating the user, please contact the administrator',
-                    'user' => $user
+                    'user' => $user,
+                    'page'	=>  'users'
                 ])
             );
         }

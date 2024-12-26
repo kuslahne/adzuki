@@ -19,6 +19,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleMVC\Controller\ControllerInterface;
 use SimpleMVC\Response\HaltResponse;
+use function Tamtamchik\SimpleFlash\flash;
+use \Tamtamchik\SimpleFlash\Flash;
 
 class Read implements ControllerInterface
 {
@@ -26,15 +28,22 @@ class Read implements ControllerInterface
 
     protected Engine $plates;
     protected ServiceCategories $categories;
+    protected $flash;
 
-    public function __construct(Engine $plates, ServiceCategories $categories)
+    public function __construct(Engine $plates, ServiceCategories $categories, flash $flash)
     {
         $this->plates = $plates;
         $this->categories = $categories;
+        $this->flash = $flash;
     }
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+		// Instance
+		//$flash = new Flash();
+		$this->flash->message('Black Tea.');
+		// Rendering all flash
+		//$output = $this->flash->display();
         $id = $request->getAttribute('id', null);
         if (empty($id)) {
             $params = $request->getQueryParams();
@@ -48,7 +57,8 @@ class Read implements ControllerInterface
                     'size' => $size,
                     'total' => $this->categories->getTotalCategories(),
                     'categories' => $this->categories->getAll($start, $size),
-                    'page'	=>  'categories'
+                    'page'	=>  'categories',
+                    'flash' => $output ?? false
                 ])
             );
         }

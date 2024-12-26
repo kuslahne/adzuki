@@ -1,10 +1,12 @@
-<?php $this->layout('admin::admin-layout', ['title' => 'Admin - Edit Post', 'page' => $page]) ?>
+<?php $this->layout('admin::admin-layout', ['title' => 'Admin - Edit Post', 'page' => $page]);
+//var_dump($formErrors); exit;	
+?>
 <h2>Edit Post</h2>
 <form action="/admin/posts/<?= $this->e($post->id)?>" id="postForm" method="POST">
-  <?php if(isset($error)): ?>
+  <?php if(isset($formErrors['content'])): ?>
     <div class="mb-3">
       <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= $this->e($error)?>
+        <?= $this->e($formErrors['content'])?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
       </div>
     </div>
@@ -77,7 +79,7 @@
 			body: formData,
 		  })
 			.then( function(response) {
-				window.location.href = '/admin/posts';
+				//window.location.href = '/admin/posts';
 			})
 			.catch((error) => console.error(error));
 		});

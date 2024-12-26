@@ -1,5 +1,5 @@
 <?php $this->layout('admin::admin-layout', ['title' => 'Admin - New Category', 'page' => $page]) ?>
-
+<?php var_dump($flash); ?>
 <h2>New Category</h2>
 <form action="/admin/categories" id="categoryForm" method="POST">
   <?php if(isset($error)): ?>

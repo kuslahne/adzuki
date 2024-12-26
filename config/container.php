@@ -16,12 +16,15 @@ use Monolog\Handler\StreamHandler;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use App\Model\Db;
+use \Tamtamchik\SimpleFlash\Flash;
+use function Tamtamchik\SimpleFlash\flash;
 
+use Handlebars\Handlebars;
+use Handlebars\Loader\FilesystemLoader;
 
 require 'lib/rb-sqlite.php';
 $c = require 'config.php';
 $db = new Db($c['database']['pdo_dsn']);
-
 
 return [
     'config' => $c,
@@ -48,6 +51,23 @@ return [
         }
         return $engine;
     },
+    Handlebars::class => function(ContainerInterface $c) {
+		# Set the partials files
+		$partialsDir = __DIR__."/../src/templates";
+		//var_dump($partialsDir); exit;
+		$partialsLoader = new FilesystemLoader($partialsDir,
+			[
+				"extension" => "tpl"
+			]
+		);
+
+		# We'll use $handlebars throughout this the examples, assuming the will be all set this way
+		$handlebars = new Handlebars([
+			"loader" => $partialsLoader,
+			"partials_loader" => $partialsLoader
+		]);
+		return $handlebars;
+	},
     Secret::class => function(ContainerInterface $c) {
         return new Secret($c->get(Engine::class), $c->get('config')['authentication']);
     },

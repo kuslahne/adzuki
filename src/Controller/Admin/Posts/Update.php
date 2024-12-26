@@ -40,15 +40,17 @@ class Update implements ControllerInterface
         $title = $params['title'] ?? '';
         $content = $params['content'] ?? '';
         $published = (int)$params['published'];
-        //var_dump($params); exit;
+        
         
         $errors = $this->checkParams($title, $content);
         if (!empty($errors)) {
+			//var_dump($errors); exit;
             return new Response(
                 400,
                 [],
                 $this->plates->render('admin::edit-post', array_merge($errors, [
-                    'post' => $post
+                    'post' => $post,
+                    'page' => 'posts'
                 ]))
             );
         }

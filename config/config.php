@@ -11,9 +11,10 @@ declare(strict_types=1);
 use App\Config\Route;
 use Monolog\Logger;
 use Psr\Container\ContainerInterface;
-use Tracy\Debugger;
 
-Debugger::enable();
+$whoops = new \Whoops\Run;
+$whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
+$whoops->register();
 
 return [
     'routing' => [

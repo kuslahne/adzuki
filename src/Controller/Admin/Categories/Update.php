@@ -19,16 +19,24 @@ use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleMVC\Controller\ControllerInterface;
+use function Tamtamchik\SimpleFlash\flash;
+use \Tamtamchik\SimpleFlash\Flash;
+use Handlebars\Handlebars;
+use Handlebars\Loader\FilesystemLoader;
 
 class Update implements ControllerInterface
 {
     protected Engine $plates;
     protected ServiceCategories $categories;
+    protected $flash;
+    protected Handlebars $handlebars;
 
-    public function __construct(Engine $plates, ServiceCategories $categories)
+    public function __construct(Engine $plates, ServiceCategories $categories, flash $flash, Handlebars $handlebars)
     {
         $this->plates = $plates;
         $this->categories = $categories;
+        $this->flash = $flash;
+        $this->handlebars = $handlebars;
     }
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -45,12 +53,23 @@ class Update implements ControllerInterface
         $errors = $this->checkParams($name, $description);
         
         if (!empty($errors)) {
+			$this->flash->warning('There was an error!');
+			//$output = $this->flash->display();
+			$output = $this->flash;
+
+			$model = [
+						"name" => "Yolo Baggins",
+						"title" => "I'm Title"
+					];
             return new Response(
                 400,
                 [],
+                //return $errors
+                //$this->handlebars->render("main", $model)
                 $this->plates->render('admin::edit-category', array_merge($errors, [
                     'category' => $category,
-                    'page'	=>  'categories'
+                    'page'	=>  'categories',
+                    'flash' => $output ?? false
                 ]))
             );
         }
@@ -90,11 +109,17 @@ class Update implements ControllerInterface
             return [];
         }
         if (strlen($description) < Category::MIN_CONTENT_LENGTH) {
-            return [
+			$this->flash->error('The content must be at least 50 characters long!');
+			return [
                 'formErrors' => [
-                    'content' => 'The content must be at least 10 characters long'
+                    'description' => 'The content must be at least 50 characters long'
                 ]
             ];
+            //return [
+                //'formErrors' => [
+                    //'description' => 'The content must be at least 50 characters long'
+                //]
+            //];
         }
         return [];
     }

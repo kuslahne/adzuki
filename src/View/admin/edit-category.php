@@ -1,14 +1,31 @@
 <?php $this->layout('admin::admin-layout', ['title' => 'Admin - Edit Category', 'page' => $page]) ?>
+<?php //exit; ?>
 <h2>Edit Category</h2>
+<?php 
+	//var_dump($flash);
+	if(isset($flash)){
+		var_dump($flash->display());
+	}
+	
+	if(isset($formErrors)){
+		foreach ($formErrors as $key => $formError) {
+			//var_dump($key);
+			//var_dump($formError);
+		}
+	}
+
+
+//exit; ?>
 <form action="/admin/categories/<?= $this->e($category->id)?>" id="categoryForm" method="POST">
-  <?php if(isset($error)): ?>
+  <?php if(isset($flashs)): foreach ($flash as $fl) {?>
     <div class="mb-3">
       <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= $this->e($error)?>
+
+        <?php var_dump($fl); ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
       </div>
     </div>
-  <?php endif; ?>
+  <?php } endif; ?>
   <?php if(isset($result)): ?>
     <div class="mb-3">
       <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -26,7 +43,7 @@
     <div>
 		<label for="description" class="form-label">Description</label>
 		<textarea id="description" name="description" class="form-control <?= isset($formErrors['description']) ? 'is-invalid' : ''?>" aria-describedby="descriptionHelp" required><?= $this->e($category->description) ?></textarea>
-		<div id="descriptionlHelp" class="form-text">Your content must be at least 10 characters long</div>
+		<div id="descriptionlHelp" class="form-text">Your content must be at least 50 characters long</div>
 		<div id="validationServerContent" class="invalid-feedback">
 		  <?= $this->e($formErrors['description'] ?? '')?>
 		</div>
@@ -54,21 +71,27 @@
 			window.location.href = '/admin/categories'
 		})
 		
-		const form = document.getElementById("categoryForm");
-		form.addEventListener("submit", (e) => {
-		  e.preventDefault();
+		//const form = document.getElementById("categoryForm");
+		//form.addEventListener("submit", (e) => {
+		  //e.preventDefault();
 
-		  const formData = new FormData(form);
+		  //const formData = new FormData(form);
 
-		  fetch("/admin/categories/<?= $this->e($category->id)?>", {
-			method: "POST",
-			body: formData,
-		  })
-			.then( function(response) {
-				window.location.href = '/admin/categories';
-			})
-			.catch((error) => console.error(error));
-		});
+		  //fetch("/admin/categories/<?= $this->e($category->id)?>", {
+			//method: "POST",
+			//body: formData,
+		  //})
+			//.then( function(response) {
+				//console.log(response);
+				//console.log(response.ok);
+				//if (!response.ok){
+					////window.location.href = '/admin/categories/<?= $this->e($category->id)?>';
+				//}
+				////window.location.href = '/admin/categories/<?= $this->e($category->id)?>';
+				////window.location.href = '/admin/categories';
+			//})
+			//.catch((error) => console.error(error));
+		//});
 	};
 </script>
 <?php $this->end() ?>

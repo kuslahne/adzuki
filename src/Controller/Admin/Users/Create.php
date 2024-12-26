@@ -39,7 +39,8 @@ class Create implements ControllerInterface
             return new Response(
                 200,
                 [],
-                $this->plates->render('admin::new-user')
+                $this->plates->render('admin::new-user',
+                ['page'	=>  'users'])
             );
         }
 
@@ -53,7 +54,8 @@ class Create implements ControllerInterface
                 400,
                 [],
                 $this->plates->render('admin::new-user', array_merge($errors, [
-                    'username' => $username
+                    'username' => $username,
+                    'page'	=>  'users'
                 ]))
             );
         }
@@ -64,7 +66,8 @@ class Create implements ControllerInterface
                 201,
                 [],
                 $this->plates->render('admin::new-user', [
-                    'result' => sprintf("The user %s has been successfully created!", $username)
+                    'result' => sprintf("The user %s has been successfully created!", $username),
+                    'page'	=>  'users'
                 ])
             );
         } catch (DatabaseException $e) {

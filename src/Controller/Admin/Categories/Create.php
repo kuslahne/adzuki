@@ -19,28 +19,38 @@ use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleMVC\Controller\ControllerInterface;
+use function Tamtamchik\SimpleFlash\flash;
+use \Tamtamchik\SimpleFlash\Flash;
 
 class Create implements ControllerInterface
 {
     protected Engine $plates;
     protected Categories $categories;
+    protected $flash;
 
-    public function __construct(Engine $plates, Categories $categories)
+    public function __construct(Engine $plates, Categories $categories, flash $flash)
     {
         $this->plates = $plates;
         $this->categories = $categories;
+        $this->flash = $flash;
     }
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $params = $request->getParsedBody();
+        // Rendering all flash
+		$output = $this->flash->display();
 
         // If no POST params just render new-category view
         if (empty($params)) {
             return new Response(
                 200,
                 [],
-                $this->plates->render('admin::new-category', ['page'	=>  'categories'])
+                $this->plates->render('admin::new-category',
+                 [
+                 'page'	=>  'categories',
+                 'flash' => $output ?? false
+                 ])
             );
         }
 
@@ -55,7 +65,8 @@ class Create implements ControllerInterface
                 [],
                 $this->plates->render('admin::new-category', array_merge($errors, [
                     'name' => $name,
-                    'page'	=>  'categories'
+                    'page'	=>  'categories',
+                    'flash' => $output
                 ]))
             );
         }

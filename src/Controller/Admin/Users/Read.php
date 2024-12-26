@@ -58,7 +58,8 @@ class Read implements ControllerInterface
                 200,
                 [],
                 $this->plates->render('admin::edit-user', [
-                    'user' => $user
+                    'user' => $user,
+                    'page'	=>  'users'
                 ])
             );
         } catch (DatabaseException $e) {

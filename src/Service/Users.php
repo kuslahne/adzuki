@@ -64,7 +64,7 @@ class Users
         if (!$users) {
             return false;
         }
-        return $users;
+        return true;
     }
 
     /**
