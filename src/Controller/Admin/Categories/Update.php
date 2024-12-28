@@ -21,22 +21,18 @@ use Psr\Http\Message\ServerRequestInterface;
 use SimpleMVC\Controller\ControllerInterface;
 use function Tamtamchik\SimpleFlash\flash;
 use \Tamtamchik\SimpleFlash\Flash;
-use Handlebars\Handlebars;
-use Handlebars\Loader\FilesystemLoader;
+
 
 class Update implements ControllerInterface
 {
     protected Engine $plates;
     protected ServiceCategories $categories;
-    protected $flash;
-    protected Handlebars $handlebars;
 
-    public function __construct(Engine $plates, ServiceCategories $categories, flash $flash, Handlebars $handlebars)
+    public function __construct(Engine $plates, ServiceCategories $categories, flash $flash)
     {
         $this->plates = $plates;
         $this->categories = $categories;
         $this->flash = $flash;
-        $this->handlebars = $handlebars;
     }
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface

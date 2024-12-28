@@ -23,7 +23,8 @@ class Route
     public static function getRoutes(): array
     {
         return [
-            [ 'GET', '/', Controller\Home::class ],
+            //[ 'GET', '/', Controller\Home::class ],
+            [ 'GET', '/', Controller\Blog::class ],
             [ 'GET', '/hello[/{name}]', Controller\Hello::class ],
             [ ['GET', 'POST'], self::LOGIN, Controller\Login::class ],
             [ 'GET', self::LOGOUT, Controller\Logout::class ],
