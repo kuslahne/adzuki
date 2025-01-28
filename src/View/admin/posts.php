@@ -7,7 +7,6 @@
     <tr>
       <th scope="col">#</th>
       <th scope="col">Title</th>
-      <th scope="col">Content</th>
       <th scope="col">Published</th>
       <th scope="col"></th>
     </tr>
@@ -21,7 +20,6 @@
     <tr>
       <td><?= sprintf("%0{$zero}d", ++$i)?></td>
       <td><?= $this->e($post->title)?></td>
-      <td><?= $this->e($post->content)?></td>
       <td><?= $post->published > 0 ? '<i class="bi bi-check text-success"></i>' : '<i class="bi bi-x text-danger"></i>'?></td>      
       <td>
       

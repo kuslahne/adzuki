@@ -14,21 +14,31 @@ use App\Config\Route;
 use App\Exception\DatabaseException;
 use App\Model\User;
 use App\Service\Users as ServiceUsers;
-use League\Plates\Engine;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleMVC\Controller\ControllerInterface;
 
+use function Tamtamchik\SimpleFlash\flash;
+use \Tamtamchik\SimpleFlash\Flash;
+use LightnCandy\LightnCandy;
+use App\Service\Handlebars;
+use App\Service\PaginatorHelper;
+use App\Controller\Admin\Users\Read;
+
 class Update implements ControllerInterface
 {
-    protected Engine $plates;
     protected ServiceUsers $users;
+	protected $flash;
+    protected Handlebars $handlebars;
+    protected PaginatorHelper $paging;
 
-    public function __construct(Engine $plates, ServiceUsers $users)
+    public function __construct(ServiceUsers $users, flash $flash, Handlebars $handlebars, PaginatorHelper $paging)
     {
-        $this->plates = $plates;
         $this->users = $users;
+		$this->flash = $flash;
+		$this->handlebars = $handlebars;
+		$this->paging = $paging;
     }
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -37,43 +47,53 @@ class Update implements ControllerInterface
         $params = $request->getParsedBody();
 
         $user = $this->users->get($id);
+        $username = $params['username'] ?? '';
         $password = $params['password'] ?? '';
         $confirmPassword = $params['confirmPassword'] ?? '';
         $active = $params['active'] ?? 'off';
         
         $errors = $this->checkParams($password, $confirmPassword);
+        $output = flash()->display();
+		$data = array(
+			'users' => [                    
+				'class'	=> 'user',
+				'page'	=> 'users'
+			],
+			'session' => [
+				'username' => $_SESSION['username'],
+				'link_logout' => \App\Config\Route::LOGOUT
+			],
+			'formErrors' => $errors,
+			'flash' => $output
+		);
+		$renderer = $this->handlebars->renderer('admin/user_edit');
+
         if (!empty($errors)) {
+			$user = $this->users->get((int) $id);
+            $data['user'] = $user;	
+            $data['title'] = 'Edit User';	
             return new Response(
                 400,
                 [],
-                $this->plates->render('admin::edit-user', array_merge($errors, [
-                    'user' => $user,
-                    'page'	=>  'users'
-                ]))
+                $renderer($data)
             );
         }
 
         try {
             $this->users->update($id, $active === 'on' ? true : false, $password);
-            return new Response(
-                200,
-                [],
-                $this->plates->render('admin::edit-user', [
-                    'result' => sprintf("The user %s has been successfully updated!", $user->username),
-                    'user' => $user,
-                    'page'	=>  'users'
-                ])
-            );
+			flash()->success([sprintf("User %s has been successfully updated!", $username)]);
+
+			return $response
+			  ->withHeader('Location', '/admin/users')
+			  ->withStatus(302);
         } catch (DatabaseException $e) {
             // @todo log error
+            flash()->error(['Error updating the user, please contact the administrator']);
+            $data['flash'] = flash()->display();
             return new Response(
                 500,
                 [],
-                $this->plates->render('admin::edit-user', [
-                    'error' => 'Error updating the user, please contact the administrator',
-                    'user' => $user,
-                    'page'	=>  'users'
-                ])
+                $renderer($data)
             );
         }
     }
@@ -85,10 +105,25 @@ class Update implements ControllerInterface
      */
     private function checkParams(string $password, string $confirmPassword): array
     {
-        if (empty($password) && empty($confirmPassword)) {
-            return [];
+		//TODO can not use same password as previously
+        if (empty($password)) {
+			flash()->error(['The password cannot be empty!']);
+            return [
+                'formErrors' => [
+                    'password' => 'The password cannot be empty'
+                ]
+            ];
+        }
+		if (empty($confirmPassword)) {
+			flash()->error(['The confirm password cannot be empty!']);
+            return [
+                'formErrors' => [
+                    'confirmPassword' => 'The confirm password cannot be empty'
+                ]
+            ];
         }
         if (strlen($password) < User::MIN_PASSWORD_LENGHT) {
+			flash()->error(['The password must be at least 10 characters long']);
             return [
                 'formErrors' => [
                     'password' => 'The password must be at least 10 characters long'
@@ -96,6 +131,7 @@ class Update implements ControllerInterface
             ];
         }
         if ($password !== $confirmPassword) {
+			flash()->error(['The password and the confirm must be equal']);
             return [
                 'formErrors' => [
                     'password' => 'The password and the confirm must be equal'

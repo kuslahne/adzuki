@@ -45,6 +45,7 @@ class Route
 			[ 'POST', '/admin/categories/{id}', [Controller\AuthSession::class, Admin\Categories\Update::class]],
 			[ 'DELETE', '/admin/categories/{id}', [Controller\AuthSession::class, Admin\Categories\Delete::class]],
 			
+			[ 'GET', '/post[/{slug}]', Controller\Blog\Article::class ],
 			
 	    //[ 'GET', '/admin/seed', [Controller\AuthSession::class, Admin\Posts\Read::class]],
         ];

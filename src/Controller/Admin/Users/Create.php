@@ -14,33 +14,61 @@ use App\Config\Route;
 use App\Exception\DatabaseException;
 use App\Model\User;
 use App\Service\Users;
-use League\Plates\Engine;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleMVC\Controller\ControllerInterface;
 
+use function Tamtamchik\SimpleFlash\flash;
+use \Tamtamchik\SimpleFlash\Flash;
+use LightnCandy\LightnCandy;
+use App\Service\Handlebars;
+use App\Service\PaginatorHelper;
+
 class Create implements ControllerInterface
 {
-    protected Engine $plates;
     protected Users $users;
+    protected $flash;
+    protected Handlebars $handlebars;
+    protected PaginatorHelper $paging;
 
-    public function __construct(Engine $plates, Users $users)
+    public function __construct(
+		Users $users,
+		flash $flash,
+		Handlebars $handlebars,
+		PaginatorHelper $paging
+	)
     {
-        $this->plates = $plates;
         $this->users = $users;
+		$this->flash = $flash;
+		$this->handlebars = $handlebars;
+		$this->paging = $paging;
     }
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+		$output = flash()->display();
         $params = $request->getParsedBody();
+		$data = array(
+			'users' => [                    
+				'class'	=> 'user',
+				'page'	=> 'users'
+			],
+			'title' => 'Add User',
+			'session' => [
+				'username' => $_SESSION['username'],
+				'link_logout' => \App\Config\Route::LOGOUT
+			],
+			'formErrors' => null,
+			'flash' => $output
+		);
         // If no POST params just render new-user view
+        $renderer = $this->handlebars->renderer('admin/user_new');
         if (empty($params)) {
             return new Response(
                 200,
                 [],
-                $this->plates->render('admin::new-user',
-                ['page'	=>  'users'])
+                $renderer($data)
             );
         }
 
@@ -50,34 +78,29 @@ class Create implements ControllerInterface
         
         $errors = $this->validateParams($username, $password, $confirmPassword);
         if (!empty($errors)) {
+			$data['flash'] = flash()->display();
             return new Response(
                 400,
                 [],
-                $this->plates->render('admin::new-user', array_merge($errors, [
-                    'username' => $username,
-                    'page'	=>  'users'
-                ]))
+                $renderer($data)
             );
         }
 
         try {
             $this->users->create($username, $password);
-            return new Response(
-                201,
-                [],
-                $this->plates->render('admin::new-user', [
-                    'result' => sprintf("The user %s has been successfully created!", $username),
-                    'page'	=>  'users'
-                ])
-            );
+			flash()->success([sprintf("The user %s has been successfully created!", $username)]);
+						
+			return $response
+			  ->withHeader('Location', '/admin/users')
+			  ->withStatus(302);
         } catch (DatabaseException $e) {
             // @todo log error
+			flash()->error(['Error adding the user, please contact the administrato']);
+            $data['flash'] = flash()->display();
             return new Response(
                 500,
                 [],
-                $this->plates->render('admin::new-user', [
-                    'error' => 'Error adding the user, please contact the administrator'
-                ])
+                $renderer($data)
             ); 
         }
     }
@@ -88,6 +111,7 @@ class Create implements ControllerInterface
     private function validateParams(string $username, string $password, string $confirmPassword): array
     {
         if (empty($username)) {
+			flash()->error(['The username cannot be empty!']);
             return [
                 'formErrors' => [
                     'username' => 'The username cannot be empty'
@@ -95,6 +119,7 @@ class Create implements ControllerInterface
             ];
         }
         if (empty($password)) {
+			flash()->error(['The password cannot be empty!']);
             return [
                 'formErrors' => [
                     'password' => 'The password cannot be empty'
@@ -102,6 +127,7 @@ class Create implements ControllerInterface
             ];
         }
         if ($this->users->exists($username)) {
+			flash()->error(['The username already exists!']);
             return [
                 'formErrors' => [
                     'username' => 'The username already exists!'
@@ -109,6 +135,7 @@ class Create implements ControllerInterface
             ];
         }
         if (strlen($password) < User::MIN_PASSWORD_LENGHT) {
+			flash()->error([sprintf("The password must be at least %d characters long", User::MIN_PASSWORD_LENGHT)]);
             return [
                 'formErrors' => [
                     'password' => sprintf("The password must be at least %d characters long", User::MIN_PASSWORD_LENGHT)
@@ -116,6 +143,7 @@ class Create implements ControllerInterface
             ];
         }
         if ($password !== $confirmPassword) {
+			flash()->error(['The password and the confirm must be equal!']);
             return [
                 'formErrors' => [
                     'password' => 'The password and the confirm must be equal'

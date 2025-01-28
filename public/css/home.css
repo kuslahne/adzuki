@@ -4,7 +4,6 @@ body {
 }
 
 body {
-  display: flex;
   align-items: center;
   padding-top: 40px;
   padding-bottom: 40px;
@@ -17,3 +16,54 @@ body {
   padding: 15px;
   margin: auto;
 }
+aside {
+  width: 250px;
+}
+.main {
+  display: flex;
+}
+.posts, .post {
+  display:flex;
+  flex-direction: column;
+}  
+#content {
+    position: absolute;
+    width: 580px;
+    left: 50%;
+    margin-left: -100px;
+} 
+.sidebar {
+    position: absolute;
+    width: 250px;
+    height: auto;
+    top: 0;
+    left: 50%;
+    bottom: 0;
+    margin-left: -460px;
+    padding-top: 65px;
+}
+
+.form-signin {
+	border: 1px solid #808080;
+    border-radius: 7px;
+    
+	.logo img {
+		height: 100px;
+		width: auto;
+		margin: 0 auto;
+	}
+	.logo {
+		margin: 0 auto;
+		width: 200px;
+	}
+	
+	.alert {
+		margin-bottom: 10px;
+	}
+}
+.footer.copyright {
+    margin-top: 20px;
+}    
+.page.login  .main {
+	width: 100%;
+}	

@@ -1,5 +1,1 @@
-<div id="footer">
-	&copy; Next, LLC. 2024. All rights reserved.&nbsp;|&nbsp;
-	<a href="/about.html">About Us</a>&nbsp;|&nbsp;
-	<a href="/privacy.html">Privacy Policy</a>
-</div>
+<div class="copyright"><span class="copyright">(c) Start Crops</span> <span class="credit">Powered by Adzuki</span></div>

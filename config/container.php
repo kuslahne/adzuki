@@ -19,6 +19,7 @@ use App\Model\Db;
 use \Tamtamchik\SimpleFlash\Flash;
 use function Tamtamchik\SimpleFlash\flash;
 use LightnCandy\LightnCandy;
+use League\CommonMark\CommonMarkConverter;
 
 require 'lib/rb-sqlite.php';
 $c = require 'config.php';
@@ -41,7 +42,14 @@ return [
             exit(1);
         }
     },
-    Engine::class => function(ContainerInterface $c) {
+    CommonMarkConverter::class => function(ContainerInterface $c) {
+        $converter = new CommonMarkConverter([
+			'html_input' => 'strip',
+			'allow_unsafe_links' => false,
+		]);
+        return $converter;
+    },
+	Engine::class => function(ContainerInterface $c) {
         $config = $c->get('config')['view'];
         $engine = new Engine($config['path']);
         foreach ($config['folders'] as $name => $folder) {

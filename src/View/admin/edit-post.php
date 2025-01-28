@@ -45,22 +45,25 @@
 </form>
 
 <?php $this->push('js') ?>
+
 <script type="text/javascript">
 	window.onload = function() {
 		var cancelButton = document.getElementById('cancel')
 			cancelButton.addEventListener('click', function(e) {
 			window.location.href = '/admin/posts'
-		})
+		})		
 
 		const editor = new toastui.Editor({
 		  el: document.querySelector('#content'),
 		  height: '500px',
 		  initialEditType: 'markdown',
 		  previewStyle: 'vertical',
-		  initialValue: '<?php echo $post->content; ?>'
+		  initialValue: <?php echo json_encode($post->content) ?>
+
 		});
 
 		editor.getMarkdown();
+		console.log(editor);
 		
 		var el = document.querySelector("#postForm #content .toastui-editor-pseudo-clipboard");
 
@@ -79,7 +82,7 @@
 			body: formData,
 		  })
 			.then( function(response) {
-				//window.location.href = '/admin/posts';
+				window.location.href = '/admin/posts';
 			})
 			.catch((error) => console.error(error));
 		});

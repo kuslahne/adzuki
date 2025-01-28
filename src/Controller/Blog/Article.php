@@ -1,7 +1,14 @@
 <?php
+/**
+ * Skeleton application for SimpleMVC
+ * 
+ * @link      http://github.com/simplemvc/skeleton
+ * @copyright Copyright (c) Enrico Zimuel (https://www.zimuel.it)
+ * @license   https://opensource.org/licenses/MIT MIT License
+ */
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Blog;
 
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
@@ -13,10 +20,9 @@ use LightnCandy\LightnCandy;
 use App\Service\Handlebars;
 use App\Service\Posts as ServicePosts;
 
-class Blog implements ControllerInterface
+class Article implements ControllerInterface
 {
-	const POSTS_PER_PAGE = 10;
-    protected $flash;
+	protected $flash;
     protected Handlebars $handlebars;
     protected ServicePosts $posts;
 
@@ -29,27 +35,27 @@ class Blog implements ControllerInterface
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-		$start = (int) ($params['start'] ?? 0);
-		$size = (int) ($params['size'] ?? self::POSTS_PER_PAGE);
+		$slug = $params['slug'] ?? null;
             
-		$template = "{{> blog_home}}";
+		$template = "{{> post_view}}";
 		$phpStr = LightnCandy::compile($template, $this->handlebars->getConfig());
 
 		//echo "Generated PHP Code:\n$phpStr\n";
 
 		// Input Data:
 		$data = array(
+			'Data' => [
+				'Hey',
+				'How', 
+				'Are',
+				'You'
+			],
 			'blog' => [                    
-				'start' => $start,
-				'size' => $size,
-				'total' => $this->posts->getTotalPublished(),
-				//'posts' => $this->posts->getAllPosts($start, $size),
-				'posts' => $this->posts->getAllPublished($start, $size),
+				'post' => $this->posts->getPostBySlug($slug),
 				'class'	=> 'blog'
 			]
 		);
 
-		// Get the render function from the php file
 		$renderer = LightnCandy::prepare($phpStr);
 				
 		return new Response(
@@ -57,5 +63,5 @@ class Blog implements ControllerInterface
 			[],
 			$renderer($data)
 		);
-	}
+    }
 }

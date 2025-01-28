@@ -14,6 +14,9 @@ use App\Exception\DatabaseException;
 use App\Model\User;
 use RedBeanPHP\Facade as R;
 
+use function Tamtamchik\SimpleFlash\flash;
+use \Tamtamchik\SimpleFlash\Flash;
+
 class Users
 {
     /**
@@ -23,7 +26,14 @@ class Users
     public function get(int $id)
     {
 		$user = R::load( 'users', $id );
-        return $user;
+		$result = R::exportAll($user);
+		return $result[0];
+    }
+    
+    public function getUser(int $id)
+    {
+		$user = R::load( 'users', $id );
+		return $user;
     }
     
     /**
@@ -32,8 +42,27 @@ class Users
      */
     public function getAll(int $start, int $size): array
     {
-		$users = R::findAll( 'users' );
+		$users = R::find( 'users' , ' LIMIT ?, ? ', [ $start, $size ] );
 		return $users;
+    }
+    
+    public function getAllUsers(int $start, int $size): array
+    {
+		$users = $this->getAll($start, $size);
+		$array = [];
+		if($users){
+			$array = R::exportAll($users);
+		}
+		
+		$result = [];
+		$counter = $start;
+		foreach($array as $key => $item){
+			$counter++;
+			$item['counter'] = $counter;
+			$item['is_active'] = $item['active'] === '1' ? true : false; 
+			$result[] = $item;
+		}
+		return $result;
     }
 
     /**

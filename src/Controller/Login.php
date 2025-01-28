@@ -14,7 +14,6 @@ use App\Config\Route;
 use App\Exception\DatabaseException;
 use App\Service\Auth;
 use App\Service\Users;
-use League\Plates\Engine;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,29 +21,46 @@ use Psr\Log\LoggerInterface;
 use SimpleMVC\Controller\ControllerInterface;
 use SimpleMVC\Controller\RouteTrait;
 
+use function Tamtamchik\SimpleFlash\flash;
+use \Tamtamchik\SimpleFlash\Flash;
+use LightnCandy\LightnCandy;
+use App\Service\Handlebars;
+
 class Login implements ControllerInterface
 {
     use RouteTrait;
 
-    protected Engine $plates;
     protected Auth $auth;
     protected Users $users;
     protected LoggerInterface $logger;
+	protected $flash;
+    protected Handlebars $handlebars;
 
-    public function __construct(Engine $plates, Auth $auth, Users $users, LoggerInterface $logger)
+    public function __construct(flash $flash, Handlebars $handlebars, Auth $auth, Users $users, LoggerInterface $logger)
     {
-        $this->plates = $plates;
         $this->auth = $auth;
         $this->users = $users;
         $this->logger = $logger;
+		$this->flash = $flash;
+		$this->handlebars = $handlebars;
     }
 
     protected function get(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+		$template = "{{> login}}";
+		$phpStr = LightnCandy::compile($template, $this->handlebars->getConfig());
+
+		$data = array(
+			'htmlClass'	=> 'login',
+			'title' => 'Login',
+			'login_url' => Route::LOGIN
+		);
+
+		$renderer = LightnCandy::prepare($phpStr);
         return new Response(
             200, 
             [], 
-            $this->plates->render('login', ['login_url' => Route::LOGIN])
+            $renderer($data),
         );
     }
 
@@ -59,13 +75,24 @@ class Login implements ControllerInterface
             if (!empty($username) && !empty($password)) {
                 $this->logger->warning(sprintf("Invalid credentials for user %s", $username));
             }
+            flash()->error(['Invalid credentials']);
+            $output = flash()->display();
+            
+			$template = "{{> login}}";
+			$phpStr = LightnCandy::compile($template, $this->handlebars->getConfig());
+
+			$data = array(
+				'htmlClass'	=> 'login',
+				'title' => 'Login',
+				'login_url' => Route::LOGIN,
+				'flash' => $output
+			);
+
+			$renderer = LightnCandy::prepare($phpStr);
             return new Response(
                 400, 
-                [], 
-                $this->plates->render('login', [
-                    'error' => 'Invalid credentials',
-                    'login_url' => Route::LOGIN
-                ])
+                [],
+                $renderer($data),
             );
         }
         $_SESSION['username'] = $username;

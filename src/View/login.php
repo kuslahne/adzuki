@@ -21,7 +21,7 @@
     <?php endif; ?>
 
     <button class="w-100 btn btn-lg btn-primary" type="submit">Login</button>
-    <p class="mt-5 mb-3 text-muted">&copy; <?= date('Y')?> <a href="https://github.com/simplemvc">SimpleMVC</a></p>
+    <p class="mt-5 mb-3 text-muted">&copy; <?= date('Y')?> <a href="https://github.com/kuslahne/adzuki">Adzuki</a></p>
   </form>
 </main>
 

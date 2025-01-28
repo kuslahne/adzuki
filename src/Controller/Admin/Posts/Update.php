@@ -14,21 +14,28 @@ use App\Config\Route;
 use App\Exception\DatabaseException;
 use App\Model\Post;
 use App\Service\Posts as ServicePosts;
-use League\Plates\Engine;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleMVC\Controller\ControllerInterface;
 
+use function Tamtamchik\SimpleFlash\flash;
+use \Tamtamchik\SimpleFlash\Flash;
+use LightnCandy\LightnCandy;
+use App\Service\Handlebars;
+
+
 class Update implements ControllerInterface
 {
-    protected Engine $plates;
     protected ServicePosts $posts;
+	protected $flash;
+    protected Handlebars $handlebars;
 
-    public function __construct(Engine $plates, ServicePosts $posts)
+    public function __construct(ServicePosts $posts, flash $flash, Handlebars $handlebars)
     {
-        $this->plates = $plates;
         $this->posts = $posts;
+		$this->flash = $flash;
+		$this->handlebars = $handlebars;
     }
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -39,42 +46,50 @@ class Update implements ControllerInterface
         $post = $this->posts->get($id);
         $title = $params['title'] ?? '';
         $content = $params['content'] ?? '';
+        $slug = $params['slug'] ?? '';
         $published = (int)$params['published'];
-        
-        
-        $errors = $this->checkParams($title, $content);
+		$errors = $this->checkParams($title, $content);
+		
+		$output = flash()->display();
+		$renderer = $this->handlebars->renderer('admin/post_edit');
+		$data = array(
+			'blog' => [                    
+				'total' => $this->posts->getTotalPosts(),
+				'class'	=> 'blog',
+				'page'	=> 'posts'
+			],
+			'session' => [
+				'username' => $_SESSION['username'],
+				'link_logout' => \App\Config\Route::LOGOUT
+			],
+			'formErrors' => $errors,
+			'flash' => $output
+		);
+
         if (!empty($errors)) {
-			//var_dump($errors); exit;
+			
             return new Response(
                 400,
                 [],
-                $this->plates->render('admin::edit-post', array_merge($errors, [
-                    'post' => $post,
-                    'page' => 'posts'
-                ]))
+                $renderer($data)
             );
         }
 
         try {
-            $this->posts->update($id, $published, $title, $content);
+            $this->posts->update($id, $published, $title, $content, $slug);
             return new Response(
                 200,
                 [],
-                $this->plates->render('admin::edit-post', [
-                    'result' => sprintf("The post %s has been successfully updated!", $post->title),
-                    'post' => $post
-                ])
+                $renderer($data)
             );
         } catch (DatabaseException $e) {
             // @todo log error
+            flash()->error(['Error updating the post, please contact the administrator']);
             return new Response(
                 500,
                 [],
-                $this->plates->render('admin::edit-post', [
-                    'error' => 'Error updating the post, please contact the administrator',
-                    'post' => $post
-                ])
-            );
+                $renderer($data),
+              );
         }
     }
 
@@ -89,6 +104,7 @@ class Update implements ControllerInterface
             return [];
         }
         if (strlen($content) < Post::MIN_CONTENT_LENGTH) {
+			flash()->error(['The content must be at least 10 characters long']);
             return [
                 'formErrors' => [
                     'content' => 'The content must be at least 10 characters long'
