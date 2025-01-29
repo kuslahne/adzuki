@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 namespace SimpleMVC\Test\Controller;
-
+session_start();
 use App\Config\Route;
 use App\Controller\Logout;
 use PHPUnit\Framework\MockObject\MockObject;

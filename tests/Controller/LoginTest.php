@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SimpleMVC\Test\Controller;
 
+session_start();
 use App\Config\Route;
 use App\Controller\Login;
 use App\Service\Auth;
@@ -43,11 +44,13 @@ final class LoginTest extends TestCase
 
     public function setUp(): void
     {
+		
         $this->auth = $this->createMock(Auth::class);
         $this->users = $this->createMock(Users::class);
         $this->logger = new NullLogger();
         $this->handlebars = new Handlebars();
-        $this->login = new Login(flash, $this->handlebars, $this->auth, $this->users, $this->logger);
+        $this->flash = new Flash();
+        $this->login = new Login($this->flash, $this->handlebars, $this->auth, $this->users, $this->logger);
         $this->request = $this->createMock(ServerRequestInterface::class);
         $this->response = $this->createMock(ResponseInterface::class);
     }

@@ -21,7 +21,6 @@ use function Tamtamchik\SimpleFlash\flash;
 use LightnCandy\LightnCandy;
 use League\CommonMark\CommonMarkConverter;
 
-require 'lib/rb-sqlite.php';
 $c = require 'config.php';
 $db = new Db($c['database']['pdo_dsn']);
 

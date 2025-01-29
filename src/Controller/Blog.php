@@ -12,6 +12,7 @@ use \Tamtamchik\SimpleFlash\Flash;
 use LightnCandy\LightnCandy;
 use App\Service\Handlebars;
 use App\Service\Posts as ServicePosts;
+use Ausi\SlugGenerator\SlugGenerator;
 
 class Blog implements ControllerInterface
 {
@@ -19,10 +20,11 @@ class Blog implements ControllerInterface
     protected $flash;
     protected Handlebars $handlebars;
     protected ServicePosts $posts;
+    protected SlugGenerator $generator;
 
     public function __construct(flash $flash, Handlebars $handlebars, ServicePosts $posts)
     {
-        $this->flash = $flash;
+		$this->flash = $flash;
 		$this->handlebars = $handlebars;
 		$this->posts = $posts;
     }

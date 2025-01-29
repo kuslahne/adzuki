@@ -7,6 +7,7 @@ namespace App\Service;
 use App\Exception\DatabaseException;
 use App\Model\Post;
 use RedBeanPHP\Facade as R;
+//use RedBeanPHP\R as R;
 use League\CommonMark\CommonMarkConverter;
 use Ausi\SlugGenerator\SlugGenerator;
 
