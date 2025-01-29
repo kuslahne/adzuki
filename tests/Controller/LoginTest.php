@@ -7,7 +7,6 @@ use App\Config\Route;
 use App\Controller\Login;
 use App\Service\Auth;
 use App\Service\Users;
-use League\Plates\Engine;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -15,6 +14,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+
+use function Tamtamchik\SimpleFlash\flash;
+use \Tamtamchik\SimpleFlash\Flash;
+use LightnCandy\LightnCandy;
+use App\Service\Handlebars;
 
 final class LoginTest extends TestCase
 {
@@ -32,18 +36,18 @@ final class LoginTest extends TestCase
 
     private Login $login;
 
-    private Engine $plates;
+	protected $flash;
+    protected Handlebars $handlebars;
 
     private LoggerInterface $logger;
 
     public function setUp(): void
     {
-        $this->plates = new Engine(__DIR__ . '/../../src/View');
         $this->auth = $this->createMock(Auth::class);
         $this->users = $this->createMock(Users::class);
         $this->logger = new NullLogger();
-
-        $this->login = new Login($this->plates, $this->auth, $this->users, $this->logger);
+        $this->handlebars = new Handlebars();
+        $this->login = new Login(flash, $this->handlebars, $this->auth, $this->users, $this->logger);
         $this->request = $this->createMock(ServerRequestInterface::class);
         $this->response = $this->createMock(ResponseInterface::class);
     }
