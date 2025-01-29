@@ -37,7 +37,7 @@ final class LoginTest extends TestCase
 
     private Login $login;
 
-	protected $flash;
+	protected Flash $flash;
     protected Handlebars $handlebars;
 
     private LoggerInterface $logger;

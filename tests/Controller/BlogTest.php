@@ -42,8 +42,7 @@ final class BlogTest extends TestCase
         $this->flash = new Flash();
 		
 		$this->generator = new SlugGenerator();
-		$this->bean = new R();
-		dump($this->bean);
+
 		$this->posts = new ServicePosts($this->generator, $this->flash, $this->handlebars);
         $this->blog = new Blog($this->flash, $this->handlebars, $this->posts);
         $this->request = $this->createMock(ServerRequestInterface::class);
@@ -55,10 +54,4 @@ final class BlogTest extends TestCase
         $response = $this->blog->execute($this->request, $this->response);
         $this->assertEquals(200, $response->getStatusCode());
     }
-
-    //public function testExecuteHasHomeViewBody(): void
-    //{
-        //$response = $this->blog->execute($this->request, $this->response);
-        //$this->assertEquals($this->plates->render('home'), (string) $response->getBody());
-    //}
 }
