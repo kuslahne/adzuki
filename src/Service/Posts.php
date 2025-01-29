@@ -59,7 +59,7 @@ class Posts
     
     public function getPublishedPosts(int $start, int $size): array
     {
-		$posts = R::find( 'posts' , 'published = ? LIMIT ?, ? ', [ 1, $start, $size ] );
+		$posts = R::find( 'posts' , 'published = ? order by id desc LIMIT ?, ? ', [ 1, $start, $size ] );
 		return $posts;
 	}
 	
@@ -73,6 +73,12 @@ class Posts
 		
 		return $this->mdConvert($items, $start);		
     }
+    
+    public function getRecentPosts(): array
+    {
+		$posts = R::find( 'posts' , 'published = ? order by id desc LIMIT ? ', [ 1, 5 ] );
+		return R::exportAll($posts);
+	}
     
     public function getAllPosts(int $start, int $size): array
     {
@@ -96,8 +102,10 @@ class Posts
 			$words = explode(" ", $item['content'], $num_words);
 			$shown_string = "";
 
-			if(count($words) == 36){
-			   $words[35] = "...";
+			if(count($words) == 36){				
+				$item['read_more'] = true;
+				$readMoreLink = '<a href="/post/'.$item['slug'].'">Read more</a>';
+				$words[35] = "..." . ' ' . $readMoreLink;
 			}
 
 			$shown_string = implode(" ", $words);		

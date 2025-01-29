@@ -43,7 +43,7 @@ class Blog implements ControllerInterface
 				'start' => $start,
 				'size' => $size,
 				'total' => $this->posts->getTotalPublished(),
-				//'posts' => $this->posts->getAllPosts($start, $size),
+				'recent_posts' => $this->posts->getRecentPosts(),
 				'posts' => $this->posts->getAllPublished($start, $size),
 				'class'	=> 'blog'
 			]
