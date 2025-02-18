@@ -14,81 +14,96 @@ use App\Config\Route;
 use App\Exception\DatabaseException;
 use App\Model\Category;
 use App\Service\Categories;
-use League\Plates\Engine;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleMVC\Controller\ControllerInterface;
 use function Tamtamchik\SimpleFlash\flash;
 use \Tamtamchik\SimpleFlash\Flash;
+use LightnCandy\LightnCandy;
+use App\Service\Handlebars;
+use App\Service\PaginatorHelper;
+
 
 class Create implements ControllerInterface
 {
-    protected Engine $plates;
     protected Categories $categories;
-    protected $flash;
+	protected $flash;
+    protected Handlebars $handlebars;
+    protected PaginatorHelper $paging;
 
-    public function __construct(Engine $plates, Categories $categories, flash $flash)
+    public function __construct(
+        Categories $categories, 
+        flash $flash, 
+		Handlebars $handlebars,
+		PaginatorHelper $paging)
     {
-        $this->plates = $plates;
         $this->categories = $categories;
         $this->flash = $flash;
+		$this->handlebars = $handlebars;
+		$this->paging = $paging;
     }
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $params = $request->getParsedBody();
-        // Rendering all flash
 		$output = $this->flash->display();
 
         // If no POST params just render new-category view
-        if (empty($params)) {
+        $data = array(
+			'class'	=> 'categories',
+			'page'	=> 'categories',
+			'repo'  => 'category',
+			'title' => 'Add Category',
+			'session' => [
+				'username' => $_SESSION['username'],
+				'link_logout' => \App\Config\Route::LOGOUT
+			],
+			'formErrors' => null,
+			'flash' => $output,
+		);
+		$renderer = $this->handlebars->renderer('admin/category_new');
+        if (empty($params)) {			
             return new Response(
                 200,
                 [],
-                $this->plates->render('admin::new-category',
-                 [
-                 'page'	=>  'categories',
-                 'flash' => $output ?? false
-                 ])
+                $renderer($data),
             );
         }
+
 
         $name = $params['name'] ?? '';
         $description = $params['description'] ?? '';
         $metaDescription = (string)$params['meta_description'] ?? '';
         
         $errors = $this->validateParams($name, $description);
+
         if (!empty($errors)) {
+			$data['flash'] = flash()->display();
             return new Response(
                 400,
                 [],
-                $this->plates->render('admin::new-category', array_merge($errors, [
-                    'name' => $name,
-                    'page'	=>  'categories',
-                    'flash' => $output
-                ]))
+                $renderer($data),
             );
         }
 
         try {
             $this->categories->create($name, $description, $metaDescription);
+			flash()->success([sprintf("The category %s has been successfully created!", $name)]);
+
             return new Response(
                 201,
                 [],
-                $this->plates->render('admin::new-category', [
-                    'result' => sprintf("The category %s has been successfully created!", $name),
-                    'page'	=>  'categories'
-                ])
+                $renderer($data),
             );
         } catch (DatabaseException $e) {
             // @todo log error
+            flash()->error(['Error adding the category, please contact the administrator']);
+            $data['flash'] = flash()->display();
             return new Response(
                 500,
                 [],
-                $this->plates->render('admin::new-category', [
-                    'error' => 'Error adding the category, please contact the administrator'
-                ])
+                $renderer($data)
             ); 
         }
     }
@@ -99,6 +114,7 @@ class Create implements ControllerInterface
     private function validateParams(string $name, string $description): array
     {
         if (empty($name)) {
+            flash()->error(['The name cannot be empty']);
             return [
                 'formErrors' => [
                     'name' => 'The name cannot be empty'
@@ -106,6 +122,7 @@ class Create implements ControllerInterface
             ];
         }
         if (empty($description)) {
+            flash()->error(['The description cannot be empty']);
             return [
                 'formErrors' => [
                     'description' => 'The description cannot be empty'
@@ -113,6 +130,7 @@ class Create implements ControllerInterface
             ];
         }
         if ($this->categories->exists($name)) {
+            flash()->error(['The name already exists!']);
             return [
                 'formErrors' => [
                     'name' => 'The name already exists!'
@@ -120,6 +138,7 @@ class Create implements ControllerInterface
             ];
         }
         if (strlen($description) < Category::MIN_CONTENT_LENGTH) {
+            flash()->error([sprintf("The description must be at least %d characters long", Category::MIN_CONTENT_LENGTH)]);
             return [
                 'formErrors' => [
                     'description' => sprintf("The description must be at least %d characters long", Category::MIN_CONTENT_LENGTH)

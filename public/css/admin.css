@@ -193,8 +193,8 @@ input[name='title'], input[name='slug'] {
   display: flex;
 }
 
-#contentHelp, #titleHelp, #slugHelp {
-  font-size: 10px;
+#contentHelp, #titleHelp, #slugHelp, #descriptionHelp {
+  font-size: 14px;
 }
 
 .form-check {
@@ -338,4 +338,8 @@ input[name='title'], input[name='slug'] {
 
 #hashLink {
     position: relative 
+}
+
+[name='meta_description'] {
+    line-height: 1.5em;
 }

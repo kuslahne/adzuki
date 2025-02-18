@@ -1,0 +1,209 @@
+<?php return array (
+  0 => 
+  array (
+    'GET' => 
+    array (
+      '/' => 'App\\Controller\\Blog',
+      '/hello' => 'App\\Controller\\Hello',
+      '/login' => 'App\\Controller\\Login',
+      '/logout' => 'App\\Controller\\Logout',
+      '/basic-auth' => 
+      array (
+        0 => 'SimpleMVC\\Controller\\BasicAuth',
+        1 => 'App\\Controller\\Secret',
+      ),
+      '/admin/users' => 
+      array (
+        0 => 'App\\Controller\\AuthSession',
+        1 => 'App\\Controller\\Admin\\Users\\Read',
+      ),
+      '/admin/posts' => 
+      array (
+        0 => 'App\\Controller\\AuthSession',
+        1 => 'App\\Controller\\Admin\\Posts\\Read',
+      ),
+      '/admin/categories' => 
+      array (
+        0 => 'App\\Controller\\AuthSession',
+        1 => 'App\\Controller\\Admin\\Categories\\Read',
+      ),
+      '/post' => 'App\\Controller\\Blog\\Article',
+    ),
+    'POST' => 
+    array (
+      '/login' => 'App\\Controller\\Login',
+      '/admin/users' => 
+      array (
+        0 => 'App\\Controller\\AuthSession',
+        1 => 'App\\Controller\\Admin\\Users\\Create',
+      ),
+      '/admin/posts' => 
+      array (
+        0 => 'App\\Controller\\AuthSession',
+        1 => 'App\\Controller\\Admin\\Posts\\Create',
+      ),
+      '/admin/categories' => 
+      array (
+        0 => 'App\\Controller\\AuthSession',
+        1 => 'App\\Controller\\Admin\\Categories\\Create',
+      ),
+    ),
+  ),
+  1 => 
+  array (
+    'GET' => 
+    array (
+      0 => 
+      array (
+        'regex' => '~^(?|/hello/([^/]+)|/admin/users/([^/]+)()|/admin/posts/([^/]+)()()|/admin/categories/([^/]+)()()()|/post/([^/]+)()()()())$~',
+        'routeMap' => 
+        array (
+          2 => 
+          array (
+            0 => 'App\\Controller\\Hello',
+            1 => 
+            array (
+              'name' => 'name',
+            ),
+          ),
+          3 => 
+          array (
+            0 => 
+            array (
+              0 => 'App\\Controller\\AuthSession',
+              1 => 'App\\Controller\\Admin\\Users\\Read',
+            ),
+            1 => 
+            array (
+              'id' => 'id',
+            ),
+          ),
+          4 => 
+          array (
+            0 => 
+            array (
+              0 => 'App\\Controller\\AuthSession',
+              1 => 'App\\Controller\\Admin\\Posts\\Read',
+            ),
+            1 => 
+            array (
+              'id' => 'id',
+            ),
+          ),
+          5 => 
+          array (
+            0 => 
+            array (
+              0 => 'App\\Controller\\AuthSession',
+              1 => 'App\\Controller\\Admin\\Categories\\Read',
+            ),
+            1 => 
+            array (
+              'id' => 'id',
+            ),
+          ),
+          6 => 
+          array (
+            0 => 'App\\Controller\\Blog\\Article',
+            1 => 
+            array (
+              'slug' => 'slug',
+            ),
+          ),
+        ),
+      ),
+    ),
+    'POST' => 
+    array (
+      0 => 
+      array (
+        'regex' => '~^(?|/admin/users/([^/]+)|/admin/posts/([^/]+)()|/admin/categories/([^/]+)()())$~',
+        'routeMap' => 
+        array (
+          2 => 
+          array (
+            0 => 
+            array (
+              0 => 'App\\Controller\\AuthSession',
+              1 => 'App\\Controller\\Admin\\Users\\Update',
+            ),
+            1 => 
+            array (
+              'id' => 'id',
+            ),
+          ),
+          3 => 
+          array (
+            0 => 
+            array (
+              0 => 'App\\Controller\\AuthSession',
+              1 => 'App\\Controller\\Admin\\Posts\\Update',
+            ),
+            1 => 
+            array (
+              'id' => 'id',
+            ),
+          ),
+          4 => 
+          array (
+            0 => 
+            array (
+              0 => 'App\\Controller\\AuthSession',
+              1 => 'App\\Controller\\Admin\\Categories\\Update',
+            ),
+            1 => 
+            array (
+              'id' => 'id',
+            ),
+          ),
+        ),
+      ),
+    ),
+    'DELETE' => 
+    array (
+      0 => 
+      array (
+        'regex' => '~^(?|/admin/users/([^/]+)|/admin/posts/([^/]+)()|/admin/categories/([^/]+)()())$~',
+        'routeMap' => 
+        array (
+          2 => 
+          array (
+            0 => 
+            array (
+              0 => 'App\\Controller\\AuthSession',
+              1 => 'App\\Controller\\Admin\\Users\\Delete',
+            ),
+            1 => 
+            array (
+              'id' => 'id',
+            ),
+          ),
+          3 => 
+          array (
+            0 => 
+            array (
+              0 => 'App\\Controller\\AuthSession',
+              1 => 'App\\Controller\\Admin\\Posts\\Delete',
+            ),
+            1 => 
+            array (
+              'id' => 'id',
+            ),
+          ),
+          4 => 
+          array (
+            0 => 
+            array (
+              0 => 'App\\Controller\\AuthSession',
+              1 => 'App\\Controller\\Admin\\Categories\\Delete',
+            ),
+            1 => 
+            array (
+              'id' => 'id',
+            ),
+          ),
+        ),
+      ),
+    ),
+  ),
+);

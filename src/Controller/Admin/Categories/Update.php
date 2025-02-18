@@ -19,20 +19,26 @@ use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleMVC\Controller\ControllerInterface;
+
 use function Tamtamchik\SimpleFlash\flash;
 use \Tamtamchik\SimpleFlash\Flash;
+use LightnCandy\LightnCandy;
+use App\Service\Handlebars;
 
 
 class Update implements ControllerInterface
 {
     protected Engine $plates;
+	protected $flash;
     protected ServiceCategories $categories;
+    protected Handlebars $handlebars;
 
-    public function __construct(Engine $plates, ServiceCategories $categories, flash $flash)
+    public function __construct(Engine $plates, ServiceCategories $categories, flash $flash, Handlebars $handlebars)
     {
         $this->plates = $plates;
         $this->categories = $categories;
         $this->flash = $flash;
+        $this->handlebars = $handlebars;
     }
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -46,43 +52,46 @@ class Update implements ControllerInterface
         $metaDescription = (string)$params['meta_description'];
        
         $errors = $this->checkParams($name, $description);
-        
-        if (!empty($errors)) {
-			$output = $this->flash->display();
+        $output = $this->flash->display();
 
+		$renderer = $this->handlebars->renderer('admin/category_edit');
+		$data = array(
+			'total' => $this->categories->getTotalCategories(),
+			'class'	=> 'categories',
+			'page'	=> 'categories',
+			'repo'  => 'category',
+			'session' => [
+				'username' => $_SESSION['username'],
+				'link_logout' => \App\Config\Route::LOGOUT
+			],
+			'formErrors' => null,
+			'flash' => $output
+		);
+
+        if (!empty($errors)) {
             return new Response(
                 400,
                 [],
-                $this->plates->render('admin::edit-category', array_merge($errors, [
-                    'category' => $category,
-                    'page'	=>  'categories',
-                    'flash' => $output ?? false
-                ]))
+                $renderer($data)
             );
         }
-
         try {
             $this->categories->update($id, $metaDescription, $name, $description);
             return new Response(
                 200,
                 [],
-                $this->plates->render('admin::edit-category', [
-                    'result' => sprintf("The category %s has been successfully updated!", $category->name),
-                    'category' => $category,
-                    'page'	=>  'categories'
-                ])
+                $renderer($data)
             );
         } catch (DatabaseException $e) {
             // @todo log error
+            flash()->error(['Error updating the category, please contact the administrator']);
             return new Response(
                 500,
                 [],
-                $this->plates->render('admin::edit-category', [
-                    'error' => 'Error updating the category, please contact the administrator',
-                    'category' => $category
-                ])
-            );
+                $renderer($data),
+              );
         }
+
     }
 
     /**
@@ -92,16 +101,11 @@ class Update implements ControllerInterface
      */
     private function checkParams(string $name, string $description): array
     {
-		if ($this->categories->exists($name)){
-			return ['formErrors' => [
-                    'name' => 'Category already exists!'
-                ] 
-			];
-		}
         if (empty($description)) {
             return [];
         }
         if (strlen($description) < Category::MIN_CONTENT_LENGTH) {
+            flash()->error(['The content must be at least 50 characters long']);
 			return [
                 'formErrors' => [
                     'description' => 'The content must be at least 50 characters long'

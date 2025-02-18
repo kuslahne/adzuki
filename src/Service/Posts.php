@@ -45,7 +45,7 @@ class Posts
     public function getPost(int $id)
     {
         $post = R::load( 'posts', $id );
- 		return $post;
+		return $post;
     }
     
     /**

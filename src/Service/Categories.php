@@ -7,8 +7,29 @@ use App\Exception\DatabaseException;
 use App\Model\Category;
 use RedBeanPHP\Facade as R;
 
+use League\CommonMark\CommonMarkConverter;
+use Ausi\SlugGenerator\SlugGenerator;
+
+use function Tamtamchik\SimpleFlash\flash;
+use \Tamtamchik\SimpleFlash\Flash;
+
 class Categories
 {
+	protected $generator;
+	protected $flash;
+    protected Handlebars $handlebars;
+	
+	public function __construct(
+		SlugGenerator $generator, 
+		flash $flash, 
+		Handlebars $handlebars, 
+	)
+	{
+		$this->generator = $generator;
+		$this->flash = $flash;
+		$this->handlebars = $handlebars;
+	}
+
     /**
      * Returns a category by ID
      * @throws DatabaseException
@@ -22,7 +43,8 @@ class Categories
                 $id
             ));
         }
-        return $category;
+	$result = R::exportAll($category);
+	return $result[0];
     }
     
     /**
@@ -31,8 +53,9 @@ class Categories
      */
     public function getAll(int $start, int $size): array
     {
-		$categories = R::findAll( 'categories' );
-		return $categories;
+	$categories = R::findAll( 'categories' );
+	$result = R::exportAll($categories);
+	return $result;
     }
 
     /**
@@ -42,7 +65,7 @@ class Categories
     public function delete(int $id): void
     {
 		$category = R::load( 'categories', $id ); //reloads our category
-	    R::trash( $category ); //for one bean
+		R::trash( $category ); //for one bean
     }
 
     /**
@@ -99,16 +122,13 @@ class Categories
      * Update the category if not empty
      * @throws DatabaseException
      */
-    public function update(int $id, string $metaDescription, string $name, string $description): void
+    public function update(int $id, string $meta_description, string $name, string $description): void
     {
-		$category = R::load( 'categories', $id ); //reloads our category
-        if (empty($metaDescription)) {
-			$category->meta_description = $description;
-        } else {
-			$category->meta_description = $metaDescription;
-        }
+		$category = R::load( 'categories', $id );        
 		$category->name = $name;
+		$category->meta_description = $meta_description;
 		$category->description = $description;
 		R::store( $category );
+		flash()->success([sprintf("The category %s has been successfully updated!", $name)]);
     }
 }

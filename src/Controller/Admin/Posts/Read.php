@@ -30,16 +30,16 @@ class Read implements ControllerInterface
     const POSTS_PER_PAGE = 2;
 
     protected ServicePosts $posts;
-	protected $flash;
+    protected $flash;
     protected Handlebars $handlebars;
     protected PaginatorHelper $paging;
 
     public function __construct(flash $flash, Handlebars $handlebars, ServicePosts $posts, PaginatorHelper $paging)
     {
         $this->flash = $flash;
-		$this->handlebars = $handlebars;
-		$this->posts = $posts; 
-		$this->paging = $paging;
+	$this->handlebars = $handlebars;
+	$this->posts = $posts; 
+	$this->paging = $paging;
     }
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -48,51 +48,52 @@ class Read implements ControllerInterface
         $output = flash()->display();
         
         if (empty($id)) {
-            $params = $request->getQueryParams();
-            $total = $this->posts->getTotalPosts(); // Total items
-            $perpage = self::POSTS_PER_PAGE; // Items per page
-            $size = (int) ($params['size'] ?? $perpage);
+		$params = $request->getQueryParams();
+		$total = $this->posts->getTotalPosts(); // Total items
+		$perpage = self::POSTS_PER_PAGE; // Items per page
+		$size = (int) ($params['size'] ?? $perpage);
 					
-			list($start, $reqPage) = $this->paging->getStart($size, $params);					
-			$paginator = $this->paging->getPaginator($total, $perpage, $start, $size, $params, $reqPage);
-			$renderer = $this->handlebars->renderer('admin/posts');
-			$data = array(
-				'blog' => [                    
-					'total' => $total,
-					'class'	=> 'blog',
-					'start' => $start,
-                    'size'  => $size,
-                    'posts' => $this->posts->getAllPosts($start, $size),
-					'page'	=> 'posts'					
-				], 
-				'session' => [
-					'username' => $_SESSION['username'],
-					'link_logout' => \App\Config\Route::LOGOUT
-				],
-				'formErrors' => null,
-				'flash' => $output,
-				'pagination' => $paginator
-			);
-			
-            return new Response(
-                200,
-                [],
-                $renderer($data)
-            );
-        }
-		
+		list($start, $reqPage) = $this->paging->getStart($size, $params);					
+		$paginator = $this->paging->getPaginator($total, $perpage, $start, $size, $params, $reqPage);
+		$renderer = $this->handlebars->renderer('admin/posts');
 		$data = array(
 			'blog' => [                    
+				'total' => $total,
 				'class'	=> 'blog',
-				'page'	=> 'posts'
-			],
+				'start' => $start,
+				'size'  => $size,
+				'posts' => $this->posts->getAllPosts($start, $size),
+				'page'	=> 'posts',
+			],			
+			'repo'  => 'post',
 			'session' => [
 				'username' => $_SESSION['username'],
 				'link_logout' => \App\Config\Route::LOGOUT
 			],
 			'formErrors' => null,
-			'flash' => $output
+			'flash' => $output,
+			'pagination' => $paginator
 		);
+			
+		return new Response(
+			200,
+			[],
+			$renderer($data)
+		);
+        }
+		
+	$data = array(
+		'blog' => [                    
+			'class'	=> 'blog',
+			'page'	=> 'posts'
+		],
+		'session' => [
+			'username' => $_SESSION['username'],
+			'link_logout' => \App\Config\Route::LOGOUT
+		],
+		'formErrors' => null,
+		'flash' => $output
+	);
 
 		
         try {
