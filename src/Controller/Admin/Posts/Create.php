@@ -14,6 +14,7 @@ use App\Config\Route;
 use App\Exception\DatabaseException;
 use App\Model\Post;
 use App\Service\Posts;
+use App\Service\Categories;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -28,12 +29,14 @@ use App\Service\PaginatorHelper;
 class Create implements ControllerInterface
 {
     protected Posts $posts;
+    protected Categories $categories;
 	protected $flash;
     protected Handlebars $handlebars;
     protected PaginatorHelper $paging;
 
     public function __construct(
 		Posts $posts,
+        Categories $categories,
 		flash $flash, 
 		Handlebars $handlebars,
 		PaginatorHelper $paging
@@ -42,6 +45,7 @@ class Create implements ControllerInterface
 		$this->flash = $flash;
 		$this->handlebars = $handlebars;
 		$this->posts = $posts; 
+        $this->categories = $categories;
 		$this->paging = $paging;
     }
 
@@ -56,6 +60,7 @@ class Create implements ControllerInterface
 				'page'	=> 'posts'					
 			],
 			'title' => 'Add Post',
+            'categories' => $this->categories->getAll(),
 			'session' => [
 				'username' => $_SESSION['username'],
 				'link_logout' => \App\Config\Route::LOGOUT
@@ -63,6 +68,7 @@ class Create implements ControllerInterface
 			'formErrors' => null,
 			'flash' => $output,
 		);
+dd($data);
 		$renderer = $this->handlebars->renderer('admin/post_new');
         if (empty($params)) {			
             return new Response(

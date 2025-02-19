@@ -152,8 +152,9 @@ header .navbar-nav {
 }
 
 .nav-sidebar {
-  width: 16.66666667%;
+  width: 20%;
   background-color: #f8f9fa !important;
+  min-width: 220px;
 }
 
 .main-column {
@@ -178,7 +179,7 @@ h3, #sidebarMenu, .copyright {
   padding: 0 15px 10px 15px;
 }
 .copyright, .credit {
-  font-size: .7em;
+  font-size: 11px;
 }
 nav .nav {
   padding-left: 0;

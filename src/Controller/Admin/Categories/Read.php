@@ -30,7 +30,7 @@ use App\Service\PaginatorHelper;
 
 class Read implements ControllerInterface
 {
-    const CATEGORIES_PER_PAGE = 10;
+    const CATEGORIES_PER_PAGE = 5;
 
     protected Engine $plates;
     protected ServiceCategories $categories;
@@ -66,7 +66,7 @@ class Read implements ControllerInterface
 			'class'	=> 'categories',
 			'start' => $start,
 			'size'  => $size,
-			'categories' => $this->categories->getAll($start, $size),
+			'categories' => $this->categories->getAllCategories($start, $size),
 			'page'	=> 'categories',
 			'repo'  => 'category',
 			'session' => [

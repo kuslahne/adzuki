@@ -53,10 +53,34 @@ class Categories
      */
     public function getAll(int $start, int $size): array
     {
-	$categories = R::findAll( 'categories' );
-	$result = R::exportAll($categories);
-	return $result;
+	    $categories = R::find( 'categories' , ' LIMIT ?, ? ', [ $start, $size ] );
+		return $categories;
     }
+
+    public function getAllCategories(int $start, int $size): array
+    {
+		$categories = $this->getAll($start, $size);
+		$array = [];
+		if($categories){
+			$items = R::exportAll($categories);
+		}
+		
+		return $this->mdConvert($items, $start);		
+    }
+
+    public function mdConvert($items, $start)
+    {
+		$converter = new CommonMarkConverter();
+		$result = [];
+		$counter = $start;
+		foreach($items as $key => $item){
+			$item['description'] = $converter->convert($item['description']);
+			$counter++;
+			$item['counter'] = $counter;
+			$result[] = $item;
+		}
+		return $result;
+	}
 
     /**
      * Delete a category with ID
