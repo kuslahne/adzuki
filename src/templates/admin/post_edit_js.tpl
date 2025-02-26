@@ -14,7 +14,6 @@
 		});
 
 		editor.getMarkdown();
-		console.log({{post.published}});
 		
 		var el = document.querySelector("#postForm #content .toastui-editor-pseudo-clipboard");
 
@@ -24,9 +23,7 @@
 		  e.preventDefault();
 
 		  var content = editor.getMarkdown();
-		  const formData = new FormData(form);
-		  
-		  
+		  const formData = new FormData(form);		  		  
 
 		  formData.set('content', content); 
 		  formData.set('published', formData.get('published') == 'on' ? 1 : 0); 
@@ -35,7 +32,6 @@
 			body: formData,
 		  })
 			.then( function(response) {
-				console.log(formData);
 				window.location.href = '/admin/posts';
 			})
 			.catch((error) => console.error(error));

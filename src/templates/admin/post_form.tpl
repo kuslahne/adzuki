@@ -38,6 +38,17 @@
 		  <label class="form-check-label" for="publishedChecked">Published</label>
 		</div>
 	  </div>
+        <div class="mb-3">
+            <label for="category">Choose a category:</label>
+
+            <select name="category" id="category">
+            {{#each categories}}
+              <option value="{{id}}" {{isSelected ../post.category_id id}}>{{name}}</option>
+            {{/each}}
+            </select>      
+        </div>
+
+
 	  <div class="mb-3">
 			<label for="content" class="form-label">Content</label>
 			<div id="content" name="content" class="form-control {{#if formErrors.content}}is-invalid{{/if}}" aria-describedby="contentHelp" required></div>

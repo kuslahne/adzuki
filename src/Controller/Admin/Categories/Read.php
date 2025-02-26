@@ -83,16 +83,16 @@ class Read implements ControllerInterface
 			$renderer($data)
 		);
         }
-	$data = array(
-		'class'	=> 'categories',
-		'page'	=> 'categories',
-		'session' => [
-			'username' => $_SESSION['username'],
-			'link_logout' => \App\Config\Route::LOGOUT
-		],
-		'formErrors' => null,
-		'flash' => $output
-	);
+	    $data = array(
+		    'class'	=> 'categories',
+		    'page'	=> 'categories',
+		    'session' => [
+			    'username' => $_SESSION['username'],
+			    'link_logout' => \App\Config\Route::LOGOUT
+		    ],
+		    'formErrors' => null,
+		    'flash' => $output
+	    );
         try {
 	    $renderer = $this->handlebars->renderer('admin/category_edit');
             $category = $this->categories->get((int) $id);

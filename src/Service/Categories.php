@@ -57,15 +57,26 @@ class Categories
 		return $categories;
     }
 
+    public function getCategories(): array
+    {
+	    $categories = R::findAll( 'categories');
+		if($categories){
+			$items = R::exportAll($categories);
+		}
+		
+		return $this->mdConvert($items, 0);	
+    }
+
     public function getAllCategories(int $start, int $size): array
     {
 		$categories = $this->getAll($start, $size);
 		$array = [];
 		if($categories){
 			$items = R::exportAll($categories);
+            return $this->mdConvert($items, $start);
 		}
 		
-		return $this->mdConvert($items, $start);		
+		return [];	
     }
 
     public function mdConvert($items, $start)

@@ -70,9 +70,10 @@ class Posts
 		$array = [];
 		if($posts){
 			$items = R::exportAll($posts);
+            return $this->mdConvert($items, $start);
 		}
 		
-		return $this->mdConvert($items, $start);		
+		return [];	
     }
     
     public function getRecentPosts(): array
@@ -87,9 +88,10 @@ class Posts
 		$array = [];
 		if($posts){
 			$items = R::exportAll($posts);
+            return $this->mdConvert($items, $start);
 		}
 		
-		return $this->mdConvert($items, $start);		
+		return [];	
     }
     
     public function mdConvert($items, $start)
@@ -160,18 +162,21 @@ class Posts
      * Create a new post
      * @throws DatabaseException
      */
-    public function create(string $title, string $content, int $published, string $slug): int
+    public function create(string $title, string $content, int $published, string $slug, int $categoryId): int
     {	
 		$is_published = $published ?: 1;
 		$post = R::dispense( 'posts' );
 		$post->title = $title;
 		$post->content = $content;
 		$post->published = $is_published;
+        $category = R::load( 'categories', $categoryId ); //load our category
+        $post->category = $category;
 		$slug = $this->createSlug($slug, $title);
 		if(is_null($slug)){
 			return null;
 		}
 		$post->slug = $slug;
+        R::store( $category );
         $id = R::store( $post );
         
         return (int)$id;
@@ -190,7 +195,7 @@ class Posts
      * Update the post if not empty
      * @throws DatabaseException
      */
-    public function update(int $id, int $published, string $title, string $content, string $slug): void
+    public function update(int $id, int $published, string $title, string $content, string $slug, int $categoryId): void
     {
 		$post = R::load( 'posts', $id ); //reloads our post
         if (empty($content)) {
@@ -207,6 +212,8 @@ class Posts
 		$post->title = $title;
 		$post->content = $content;
 		$post->slug = $slug;
+        $category = R::load( 'categories', $categoryId ); //load our category
+        $post->category = $category;
 		R::store( $post );
 		flash()->success([sprintf("The post %s has been successfully updated!", $title)]);
     }

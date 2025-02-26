@@ -48,6 +48,7 @@ class Update implements ControllerInterface
         $content = $params['content'] ?? '';
         $slug = $params['slug'] ?? '';
         $published = (int)$params['published'];
+        $categoryId = (int)$params['category'];
 		$errors = $this->checkParams($title, $content);
 		
 		$output = flash()->display();
@@ -76,7 +77,7 @@ class Update implements ControllerInterface
         }
 
         try {
-            $this->posts->update($id, $published, $title, $content, $slug);
+            $this->posts->update($id, $published, $title, $content, $slug, $categoryId);
             return new Response(
                 200,
                 [],

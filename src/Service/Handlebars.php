@@ -37,6 +37,9 @@ class Handlebars
 			  },
 			  "isChecked" => function ($arg1) {
 				return ($arg1 == 1) ? 'checked' : '';
+			  },
+              "isSelected" => function ($arg1, $arg2) {
+				return ($arg1 == $arg2) ? 'selected' : '';
 			  }
 			)
 		);

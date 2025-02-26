@@ -25,7 +25,6 @@
 	  })
 	  .then( function(response) {
 				window.location.href = '/admin/posts';
-				console.log(response);
 			}).catch((error) => console.error(error));
 	});
 </script>

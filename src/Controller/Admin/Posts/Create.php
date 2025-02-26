@@ -60,7 +60,7 @@ class Create implements ControllerInterface
 				'page'	=> 'posts'					
 			],
 			'title' => 'Add Post',
-            'categories' => $this->categories->getAll(),
+            'categories' => $this->categories->getCategories(),
 			'session' => [
 				'username' => $_SESSION['username'],
 				'link_logout' => \App\Config\Route::LOGOUT
@@ -68,7 +68,7 @@ class Create implements ControllerInterface
 			'formErrors' => null,
 			'flash' => $output,
 		);
-dd($data);
+
 		$renderer = $this->handlebars->renderer('admin/post_new');
         if (empty($params)) {			
             return new Response(
@@ -81,6 +81,7 @@ dd($data);
         $title = $params['title'] ?? '';
         $content = $params['content'] ?? '';
         $published = $params['published'] ?? 0;
+        $categoryId = (int)$params['category'];
         $slug = $params['slug'] ?? '';
         
         $errors = $this->validateParams($title, $content);
@@ -94,7 +95,8 @@ dd($data);
         }
 
         try {
-            $this->posts->create($title, $content, $published, $slug);
+
+            $this->posts->create($title, $content, $published, $slug, $categoryId);
 			flash()->success([sprintf("The post %s has been successfully created!", $title)]);
 
             return new Response(
