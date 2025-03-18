@@ -187,7 +187,7 @@ nav .nav {
 nav .nav-item {
   list-style-type: none;
 }
-input[name='title'], input[name='slug'] {
+input[name='title'], input[name='slug'], input[name='tag'] {
   width: 50%;
 }
 .main {

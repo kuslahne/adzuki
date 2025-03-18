@@ -14,21 +14,26 @@ use Ausi\SlugGenerator\SlugGenerator;
 use function Tamtamchik\SimpleFlash\flash;
 use \Tamtamchik\SimpleFlash\Flash;
 
+use App\Service\Tags;
+
 class Posts
 {
 	protected $generator;
 	protected $flash;
     protected Handlebars $handlebars;
+    protected $tags;
 	
 	public function __construct(
 		SlugGenerator $generator, 
 		flash $flash, 
 		Handlebars $handlebars, 
+        Tags $tags
 	)
 	{
 		$this->generator = $generator;
 		$this->flash = $flash;
 		$this->handlebars = $handlebars;
+        $this->tags = $tags;
 	}
 	
     /**
@@ -38,6 +43,12 @@ class Posts
     public function get(int $id)
     {
         $post = R::load( 'posts', $id );
+
+        //$sql = "SELECT posts.* FROM posts JOIN posttags WHERE posttags.post_id = $id JOIN tags WHERE posttags.tag_id = tags.id";
+        //$sql = "SELECT posts.*, posttags.* FROM posts JOIN posttags WHERE posttags.post_id = $id";
+        //$rows = R::getAll($sql);
+        //$posts = R::convertToBeans('posts', $rows);
+        //$result = R::exportAll($posts);
         $result = R::exportAll($post);
 		return $result[0];
     }
@@ -162,8 +173,13 @@ class Posts
      * Create a new post
      * @throws DatabaseException
      */
-    public function create(string $title, string $content, int $published, string $slug, int $categoryId): int
+    public function create(string $title, string $content, int $published, string $slug, int $categoryId, string $tags): int
     {	
+        if(empty($tags)){
+            flash()->error(['Tag can not be empty!']);
+            return null;
+        }
+        $allTags = $this->tags->create($tags);
 		$is_published = $published ?: 1;
 		$post = R::dispense( 'posts' );
 		$post->title = $title;
@@ -178,6 +194,8 @@ class Posts
 		$post->slug = $slug;
         R::store( $category );
         $id = R::store( $post );
+        $this->addTagstoPost($allTags, $id, $is_published);
+        flash()->success([sprintf("The post %s has been successfully created!", $title)]);
         
         return (int)$id;
     }
@@ -185,8 +203,8 @@ class Posts
     public function createTable(): void
     {
         $post = R::dispense( 'posts' );
-		$post->title = 'Learn to Program';
-        $post->content = 'This is hello world';
+		$post->title = 'Learn to code';
+        $post->content = 'Hello world';
 		$post->published = true;
         $id = R::store( $post );	
     }
@@ -195,7 +213,7 @@ class Posts
      * Update the post if not empty
      * @throws DatabaseException
      */
-    public function update(int $id, int $published, string $title, string $content, string $slug, int $categoryId): void
+    public function update(int $id, int $published, string $title, string $content, string $slug, int $categoryId, string $tags): void
     {
 		$post = R::load( 'posts', $id ); //reloads our post
         if (empty($content)) {
@@ -203,7 +221,13 @@ class Posts
         } else {
 			$post->published = $published;
         }
-        
+        if(empty($tags)){
+            flash()->error(['Tag can not be empty!']);
+            return;
+        }
+
+        $this->processTags($tags, $id, $published);
+       
         $slug = $this->createSlug($slug, $title, $id);
         if(is_null($slug)){
 			return;
@@ -214,8 +238,24 @@ class Posts
 		$post->slug = $slug;
         $category = R::load( 'categories', $categoryId ); //load our category
         $post->category = $category;
-		R::store( $post );
+		$id = R::store( $post );
+
 		flash()->success([sprintf("The post %s has been successfully updated!", $title)]);
+    }
+
+    public function processTags($tags, $postId, $published)
+    {   
+        // Process tags
+        $allTags = $this->tags->create($tags);
+        //Read again 
+        $this->addTagstoPost($allTags, $postId, $published);
+    }
+
+    public function addTagstoPost($allTags, $postId, $published)
+    {
+        $rowTags = $this->tags->getAllTagsbyInput($allTags);
+        $this->tags->deletePostTagsByPostId($postId);
+        $this->tags->addPostTags($postId, $rowTags, $published);
     }
     
     public function slugExist(string $slug, int $id)

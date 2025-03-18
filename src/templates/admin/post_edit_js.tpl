@@ -27,12 +27,13 @@
 
 		  formData.set('content', content); 
 		  formData.set('published', formData.get('published') == 'on' ? 1 : 0); 
+
 		  fetch("/admin/posts/{{post.id}}", {
 			method: "POST",
 			body: formData,
 		  })
 			.then( function(response) {
-				window.location.href = '/admin/posts';
+			    //window.location.href = '/admin/posts';
 			})
 			.catch((error) => console.error(error));
 		});

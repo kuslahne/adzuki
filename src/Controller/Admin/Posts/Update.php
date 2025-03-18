@@ -49,7 +49,9 @@ class Update implements ControllerInterface
         $slug = $params['slug'] ?? '';
         $published = (int)$params['published'];
         $categoryId = (int)$params['category'];
-		$errors = $this->checkParams($title, $content);
+        $tags = $params['tag'];
+
+		$errors = $this->checkParams($title, $content, $tags);
 		
 		$output = flash()->display();
 		$renderer = $this->handlebars->renderer('admin/post_edit');
@@ -77,7 +79,7 @@ class Update implements ControllerInterface
         }
 
         try {
-            $this->posts->update($id, $published, $title, $content, $slug, $categoryId);
+            $this->posts->update($id, $published, $title, $content, $slug, $categoryId, $tags);
             return new Response(
                 200,
                 [],
@@ -99,7 +101,7 @@ class Update implements ControllerInterface
      * 
      * @return array<string, array<string, string>>
      */
-    private function checkParams(string $title, string $content): array
+    private function checkParams(string $title, string $content, string $tags): array
     {
         if (empty($content)) {
             return [];

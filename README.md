@@ -30,16 +30,16 @@ Follow this guide:
 
 ## TODOS
 
-Full theme work on frontend
-Move backend template to Handlebars
-Pagination support
-Post view detail
-Sidebar widget post by Months
-Add category on post
-Add tag on post
-Add meta tag canonical
-Add slug on post
-Add search
+- Full theme work on frontend
+- Move backend template to Handlebars [x]
+- Pagination support [x]
+- Post view detail
+- Sidebar widget post by Months
+- Add category on post [x]
+- Add tag on post
+- Add meta tag canonical
+- Add slug on post [x]
+- Add search on frontend
 
 
 This software is released under the [MIT](/LICENSE) license.

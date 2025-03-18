@@ -26,6 +26,8 @@ use LightnCandy\LightnCandy;
 use App\Service\Handlebars;
 use App\Service\PaginatorHelper;
 
+use App\Service\Tags;
+
 class Read implements ControllerInterface
 {
     const POSTS_PER_PAGE = 2;
@@ -35,14 +37,18 @@ class Read implements ControllerInterface
     protected $flash;
     protected Handlebars $handlebars;
     protected PaginatorHelper $paging;
+    protected $tags;
 
-    public function __construct(flash $flash, Handlebars $handlebars, ServicePosts $posts, ServiceCategories $categories, PaginatorHelper $paging)
+    public function __construct(flash $flash, Handlebars $handlebars, ServicePosts $posts, ServiceCategories $categories, PaginatorHelper $paging,
+        Tags $tags    
+    )
     {
         $this->flash = $flash;
 	    $this->handlebars = $handlebars;
 	    $this->posts = $posts;
         $this->categories = $categories;
 	    $this->paging = $paging;
+        $this->tags = $tags;
     }
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -97,7 +103,8 @@ class Read implements ControllerInterface
 			    'link_logout' => \App\Config\Route::LOGOUT
 		    ],
 		    'formErrors' => null,
-		    'flash' => $output
+		    'flash' => $output,
+            'postEdit' => true
 	    );
 
 
@@ -105,7 +112,10 @@ class Read implements ControllerInterface
             $renderer = $this->handlebars->renderer('admin/post_edit');
             $post = $this->posts->get((int) $id);
             $data['post'] = $post;
+            $data['tags'] = $this->tags->getTagStringbyPostId($id);
             $data['title'] = 'Edit Post';
+//dd($data);
+
             return new Response(
                 200,
                 [],

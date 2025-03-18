@@ -10,14 +10,6 @@
 		  </div>
 		</div>
 	  {{/if}}
-	  {{#if result}}
-		<div class="mb-3">
-		  <div class="alert alert-success alert-dismissible fade show" role="alert">
-			<?= $this->e($result)?>
-			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		  </div>
-		</div>
-	  {{/if}}
 
 	  <div class="mb-flex">
 		  <div>
@@ -43,12 +35,14 @@
 
             <select name="category" id="category">
             {{#each categories}}
-              <option value="{{id}}" {{isSelected ../post.category_id id}}>{{name}}</option>
+              <option value="{{id}}" {{#if ../post.category_id}}{{isSelected ../post.category_id id}}{{/if}}>{{name}}</option>
             {{/each}}
             </select>      
-        </div>
-
-
+        </div>      
+	  <div class="mb-3">
+		<label for="category">Tags:</label>
+		<input type="text" class="form-control text  ui-autocomplete-input" id="postTag" name="tag" value="{{ tags }}" placeholder="Comma separated values" autocomplete="off">
+	  </div>
 	  <div class="mb-3">
 			<label for="content" class="form-label">Content</label>
 			<div id="content" name="content" class="form-control {{#if formErrors.content}}is-invalid{{/if}}" aria-describedby="contentHelp" required></div>
@@ -57,6 +51,9 @@
 			  {{formErrors.content}}
 			</div>
 	  </div>
+      {{#if postEdit}}
+            <input type="hidden" value="{{ tags }}" name="tag_ori">
+      {{/if}}
 	  <button type="button" class="btn btn-secondary" id="cancel">Cancel</button>
 	  <button type="submit" class="btn btn-primary">Save</button>
 	</form>

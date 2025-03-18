@@ -53,6 +53,7 @@ class Create implements ControllerInterface
     {
 		$output = flash()->display();
         $params = $request->getParsedBody();
+        
         // If no POST params just render new-post view
         $data = array(
 			'blog' => [                    
@@ -80,9 +81,10 @@ class Create implements ControllerInterface
 
         $title = $params['title'] ?? '';
         $content = $params['content'] ?? '';
-        $published = $params['published'] ?? 0;
+        $published = (int)$params['published'] ?? 0;
         $categoryId = (int)$params['category'];
         $slug = $params['slug'] ?? '';
+        $tags = $params['tag'];
         
         $errors = $this->validateParams($title, $content);
         if (!empty($errors)) {
@@ -96,9 +98,7 @@ class Create implements ControllerInterface
 
         try {
 
-            $this->posts->create($title, $content, $published, $slug, $categoryId);
-			flash()->success([sprintf("The post %s has been successfully created!", $title)]);
-
+            $this->posts->create($title, $content, $published, $slug, $categoryId, $tags);
             return new Response(
                 201,
                 [],
