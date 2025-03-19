@@ -68,6 +68,7 @@ class Create implements ControllerInterface
 			],
 			'formErrors' => null,
 			'flash' => $output,
+            'postEdit' => false
 		);
 
 		$renderer = $this->handlebars->renderer('admin/post_new');
@@ -81,7 +82,7 @@ class Create implements ControllerInterface
 
         $title = $params['title'] ?? '';
         $content = $params['content'] ?? '';
-        $published = (int)$params['published'] ?? 0;
+        $published = isset($params['published']) ? 1 : 0;
         $categoryId = (int)$params['category'];
         $slug = $params['slug'] ?? '';
         $tags = $params['tag'];

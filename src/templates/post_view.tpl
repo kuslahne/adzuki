@@ -1,5 +1,5 @@
 {{#>layout}}
 	{{#*inline "content"}}
-	{{> posts_list}}
+	{{> post_detail}}
 	{{/inline}}
 {{/layout}}

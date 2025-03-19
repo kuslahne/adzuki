@@ -35,12 +35,15 @@ class Article implements ControllerInterface
 
     public function execute(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-		$slug = $params['slug'] ?? null;
+        $slug = $request->getAttribute('slug', null);
+//		$slug = $params['slug'] ?? null;
             
 		$template = "{{> post_view}}";
 		$phpStr = LightnCandy::compile($template, $this->handlebars->getConfig());
 
 		//echo "Generated PHP Code:\n$phpStr\n";
+//        dump($params);
+        //dd($slug);
 
 		// Input Data:
 		$data = array(
@@ -50,11 +53,12 @@ class Article implements ControllerInterface
 				'Are',
 				'You'
 			],
-			'blog' => [                    
-				'post' => $this->posts->getPostBySlug($slug),
+			'blog' => [                    				
 				'class'	=> 'blog'
-			]
+			],
+            'post' => $this->posts->getPostBySlug($slug),
 		);
+        //dd($data);
 
 		$renderer = LightnCandy::prepare($phpStr);
 				

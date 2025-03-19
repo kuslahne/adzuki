@@ -56,9 +56,23 @@ class Posts
     public function getPost(int $id)
     {
         $post = R::load( 'posts', $id );
-		return $post;
+        $result = R::exportAll($post);
+		return $result;
     }
     
+
+    public function getPostBySlug(string $slug)
+    {
+        $post = R::findOne( 'posts', ' slug = ? ', [ $slug ] );
+ 		$array = [];
+		if($post){
+			$item = R::exportAll($post);
+            return $this->mdConvertPost($item[0]);
+		}
+		
+		return [];	
+    }
+
     /**
      * Returns all posts
      * @return Post[]
@@ -132,6 +146,32 @@ class Posts
 		return $result;
 	}
 
+    public function mdConvertPost($item)
+    {
+		$converter = new CommonMarkConverter();
+		$result = [];
+//dd($item);
+
+//		$num_words = 36;
+//		$words = [];
+//		$words = explode(" ", $item['content'], $num_words);
+//		$shown_string = "";
+//
+//		if(count($words) == 36){				
+//			$item['read_more'] = true;
+//			$readMoreLink = '<a href="/post/'.$item['slug'].'">Read more</a>';
+//			$words[35] = "..." . ' ' . $readMoreLink;
+//		}
+//
+//		$shown_string = implode(" ", $words);		
+		$item['content'] = $converter->convert($item['content']);
+		$item['is_published'] = $item['published'] === '1' ? true : false; 
+		$result[] = $item;
+//        dd($item);
+
+		return $item;
+	}
+
     /**
      * Delete a post with ID
      * @throws DatabaseException
@@ -180,7 +220,7 @@ class Posts
             return null;
         }
         $allTags = $this->tags->create($tags);
-		$is_published = $published ?: 1;
+		$is_published = $published ? (int)$published: 0;
 		$post = R::dispense( 'posts' );
 		$post->title = $title;
 		$post->content = $content;

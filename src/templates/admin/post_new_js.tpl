@@ -24,7 +24,7 @@
 		body: formData,
 	  })
 	  .then( function(response) {
-				window.location.href = '/admin/posts';
+				//window.location.href = '/admin/posts';
 			}).catch((error) => console.error(error));
 	});
 </script>

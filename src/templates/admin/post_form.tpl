@@ -35,7 +35,7 @@
 
             <select name="category" id="category">
             {{#each categories}}
-              <option value="{{id}}" {{#if ../post.category_id}}{{isSelected ../post.category_id id}}{{/if}}>{{name}}</option>
+              <option value="{{id}}" {{#if ../postEdit }}{{#if ../post.category_id}}{{isSelected ../post.category_id id}}{{/if}} {{/if}}>{{name}}</option>
             {{/each}}
             </select>      
         </div>      
