@@ -50,6 +50,7 @@ class Update implements ControllerInterface
         $published = (int)$params['published'];
         $categoryId = (int)$params['category'];
         $tags = $params['tag'];
+        $oldTags = $params['tag_ori'];
 
 		$errors = $this->checkParams($title, $content, $tags);
 		
@@ -79,7 +80,7 @@ class Update implements ControllerInterface
         }
 
         try {
-            $this->posts->update($id, $published, $title, $content, $slug, $categoryId, $tags);
+            $this->posts->update($id, $published, $title, $content, $slug, $categoryId, $tags, $oldTags);
             return new Response(
                 200,
                 [],

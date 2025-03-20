@@ -77,8 +77,49 @@ class Tags
         //return R::exportAll( $tags );
     }
 
-    public function create(string $tags)
-    {	
+    //Only on update tags
+    public function diff(string $tags, string $oldTags)
+    {
+//        $tagsArray = explode(',', $tags);
+        $tagsArray = $this->cleanAndCreateArray($tags);
+//        $oldTagsArray = explode(',', $oldTags);
+        $oldTagsArray = $this->cleanAndCreateArray($oldTags);
+        $tagsToDelete = [];
+        $tagsToKeep = [];
+
+        $tagsToCompare = [];
+        $newTags = [];
+
+        foreach ($oldTagsArray as $oldTag)
+        {
+            if(in_array($oldTag, $tagsArray)){
+                $tagsToKeep[] = $oldTag;
+            }else {
+                $tagsToDelete[] = $oldTag;
+            }
+        }
+
+        foreach ($tagsArray as $tag)
+        {
+            if(in_array($tag, $tagsToKeep)){
+                $tagsToCompare[] = $tag;
+            } else {
+                $newTags[] = $tag;
+            }
+        }
+
+        $diffs = array(
+            'new' => $newTags,
+            'compare' => $tagsToCompare,
+            'keep'  =>  $tagsToKeep,
+            'create' => array_merge($newTags, $tagsToKeep),
+            'delete' => $tagsToDelete
+        );
+        return $diffs;
+    }
+
+    public function cleanAndCreateArray(string $tags)
+    {
         $tagsArray = explode(',', $tags);
         
         $coll = [];
@@ -88,17 +129,33 @@ class Tags
             }
             $coll[] = trim($item);
         }
-        $allTags = $this->getAllTagsbyFilters($coll);
+        return $coll;
+    }
+
+    public function create(array $tagsArray)
+    {	
+//        $tagsArray = explode(',', $tags);
+//        
+//        $coll = [];
+//        foreach($tagsArray as $item) {
+//            if($item == ' ' || in_array(trim($item), $coll)){
+//                continue;
+//            }
+//            $coll[] = trim($item);
+//        }
+//        $coll = $this->cleanAndCreateArray($tags);
+
+        $allTags = $this->getAllTagsbyFilters($tagsArray);
         //$allTags = ['testd'];
         //print_r($allTags);
         //exit;
 
         $inputs = [];
-        foreach($coll as $col) {
-            if (in_array(strtolower($col), $allTags)) {
+        foreach($tagsArray as $tag) {
+            if (in_array(strtolower($tag), $allTags)) {
                 continue;
             }
-            $inputs[] = $col;
+            $inputs[] = $tag;
         }
         if(count($inputs) > 0){
             // Insert new tag
@@ -118,7 +175,43 @@ class Tags
              R::storeAll($beans);
         }
 
-        return $coll;
+//        return $coll;
+    }
+
+    public function findTagsByName($arr)
+    {
+        $tags = R::find( 'tags',
+            ' name IN ( '. R::genSlots( $arr ) .' ) ',
+            $arr );
+
+        return $tags;
+    }
+
+    public function findPostTagsByTagName($arr)
+    {
+        print_r($arr);
+        $sql = "SELECT posttags.*, tags.name as tag_name FROM posttags JOIN tags 
+            ON posttags.tag_id = tags.id WHERE tags.name IN (".    R::genSlots( $arr ) .")";
+        $rows = R::getAll($sql, $arr);
+//        $posts = R::convertToBeans('posttags', $rows);
+//        $result = R::exportAll($posts);
+
+//        return $result;
+
+//        $tags = R::find('tags');
+//        $posts = R::loadJoined( $tags, 'posttags' );
+//        $result = R::exportAll($rows);
+
+        return $rows;
+    }
+
+    public function countPostTagsByTagName($arr)
+    {
+        print_r($arr);
+        $sql = "SELECT posttags.*, tags.name as tag_name, count(post_id) as count_posts FROM posttags JOIN tags 
+            ON posttags.tag_id = tags.id WHERE tags.name IN (".    R::genSlots( $arr ) .")  GROUP BY tag_name";
+        $rows = R::getAll($sql, $arr);
+        return $rows;
     }
 
     public function deletePostTagsByPostId($id)
@@ -127,6 +220,26 @@ class Tags
         R::hunt( 'posttags',
             ' post_id IN ( '. R::genSlots( $ids ) .' ) ',
             $ids );
+    }
+
+    public function deletePostTagsByTagIdAndPostId($tagId, $postId)
+    {
+        echo $tagId." " .$postId;
+        $posttags  = R::find( 'posttags', ' tag_id = :tag_id AND post_id = :post_id', [ ':tag_id' => $tagId, ':post_id' => $postId ] );
+        R::trashAll( $posttags );
+//        $result = R::exportAll($posttag);
+//        print_r($result[0]);
+//        echo $result[0]['id'];
+//        $this->deletePostTagsByPostId($result[0]['id']);
+//        return $result;
+    }
+
+    public function deleteTagsByTagId($tagId)
+    {
+        $tagIds = [$tagId];
+        R::hunt( 'tags',
+            ' id IN ( '. R::genSlots( $tagIds ) .' ) ',
+            $tagIds );
     }
 
     public function addPostTags($postId, $tags, $published)
@@ -147,12 +260,6 @@ class Tags
 
     public function getAllTagsByPostId($postId)
     {
-//        $tags  = R::find( 'posttags', ' post_id = ? ', [$postId]);
-//        if($tags){
-//            return R::exportAll( $tags );
-//        }
-//        return false;
-//
         $sql = "SELECT posttags.*, tags.name as tag_name FROM posttags JOIN tags ON posttags.tag_id = tags.id WHERE posttags.post_id = ?";
 
         $rows = R::getAll($sql, [$postId]);

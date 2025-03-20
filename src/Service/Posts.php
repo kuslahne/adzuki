@@ -219,13 +219,16 @@ class Posts
             flash()->error(['Tag can not be empty!']);
             return null;
         }
-        $allTags = $this->tags->create($tags);
+        $tagsArray = $this->tags->cleanAndCreateArray($tags);
+        $this->tags->create($tagsArray);
+
 		$is_published = $published ? (int)$published: 0;
 		$post = R::dispense( 'posts' );
 		$post->title = $title;
 		$post->content = $content;
 		$post->published = $is_published;
-        $category = R::load( 'categories', $categoryId ); //load our category
+        //load our category
+        $category = R::load( 'categories', $categoryId ); 
         $post->category = $category;
 		$slug = $this->createSlug($slug, $title);
 		if(is_null($slug)){
@@ -234,7 +237,7 @@ class Posts
 		$post->slug = $slug;
         R::store( $category );
         $id = R::store( $post );
-        $this->addTagstoPost($allTags, $id, $is_published);
+        $this->addTagstoPost($tagsArray, $id, $is_published);
         flash()->success([sprintf("The post %s has been successfully created!", $title)]);
         
         return (int)$id;
@@ -253,7 +256,7 @@ class Posts
      * Update the post if not empty
      * @throws DatabaseException
      */
-    public function update(int $id, int $published, string $title, string $content, string $slug, int $categoryId, string $tags): void
+    public function update(int $id, int $published, string $title, string $content, string $slug, int $categoryId, string $tags, string $oldTags): void
     {
 		$post = R::load( 'posts', $id ); //reloads our post
         if (empty($content)) {
@@ -266,7 +269,34 @@ class Posts
             return;
         }
 
-        $this->processTags($tags, $id, $published);
+        $diff = $this->tags->diff($tags, $oldTags);
+
+        $rowsTags = $this->tags->findTagsByName($diff['delete']);
+//        $rowPosttags = $this->tags->findPostTagsByTagName($diff['delete']);
+        $rowPosttags = $this->tags->countPostTagsByTagName($diff['delete']);
+        foreach ($rowPosttags as $delRow){
+            if($delRow['count_posts'] == 1){
+//                echo "a"; echo "<br/>";
+                // Delete tag and their posttags
+
+                $this->tags->deletePostTagsByTagIdAndPostId($delRow['tag_id'], $id);
+                $this->tags->deleteTagsByTagId($delRow['tag_id']);
+            } 
+            if ($delRow['count_posts'] > 1) {
+//                echo "b"; echo "<br/>";
+                // Only delete their associate posttags
+                $this->tags->deletePostTagsByTagIdAndPostId($delRow['tag_id'], $id);
+            }
+
+        }
+//        echo "<pre>";
+//        print_r ($diff); 
+
+//        print_r ($rowsTags); 
+        //print_r ($rowPosttags); 
+//        echo "</pre>";
+//        exit;
+        $this->processTags($diff['create'], $id, $published);
        
         $slug = $this->createSlug($slug, $title, $id);
         if(is_null($slug)){
@@ -283,12 +313,12 @@ class Posts
 		flash()->success([sprintf("The post %s has been successfully updated!", $title)]);
     }
 
-    public function processTags($tags, $postId, $published)
+    public function processTags($tagsArray, $postId, $published)
     {   
         // Process tags
-        $allTags = $this->tags->create($tags);
+        $this->tags->create($tagsArray);
         //Read again 
-        $this->addTagstoPost($allTags, $postId, $published);
+        $this->addTagstoPost($tagsArray, $postId, $published);
     }
 
     public function addTagstoPost($allTags, $postId, $published)
