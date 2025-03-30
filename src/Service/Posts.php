@@ -213,7 +213,7 @@ class Posts
      * Create a new post
      * @throws DatabaseException
      */
-    public function create(string $title, string $content, int $published, string $slug, int $categoryId, string $tags): int
+    public function create(string $title, string $content, int $published, string $slug, int $categoryId, string $tags, string $metaDesc): int
     {	
         if(empty($tags)){
             flash()->error(['Tag can not be empty!']);
@@ -230,6 +230,9 @@ class Posts
         //load our category
         $category = R::load( 'categories', $categoryId ); 
         $post->category = $category;
+        if(!empty($metaDesc)){
+            $post->meta_desc = $metaDesc;
+        }
 		$slug = $this->createSlug($slug, $title);
 		if(is_null($slug)){
 			return null;
@@ -256,13 +259,16 @@ class Posts
      * Update the post if not empty
      * @throws DatabaseException
      */
-    public function update(int $id, int $published, string $title, string $content, string $slug, int $categoryId, string $tags, string $oldTags): void
+    public function update(int $id, int $published, string $title, string $content, string $slug, int $categoryId, string $tags, string $oldTags, string $metaDesc): void
     {
 		$post = R::load( 'posts', $id ); //reloads our post
         if (empty($content)) {
 			$post->published = 0;
         } else {
 			$post->published = $published;
+        }
+        if(!empty($metaDesc)){
+            $post->meta_desc = $metaDesc;
         }
         if(empty($tags)){
             flash()->error(['Tag can not be empty!']);

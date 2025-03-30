@@ -85,6 +85,7 @@ class Create implements ControllerInterface
         $published = isset($params['published']) ? 1 : 0;
         $categoryId = (int)$params['category'];
         $slug = $params['slug'] ?? '';
+        $metaDesc = $params['description'] ?? '';
         $tags = $params['tag'];
         
         $errors = $this->validateParams($title, $content);
@@ -99,7 +100,7 @@ class Create implements ControllerInterface
 
         try {
 
-            $this->posts->create($title, $content, $published, $slug, $categoryId, $tags);
+            $this->posts->create($title, $content, $published, $slug, $categoryId, $tags, $metaDesc);
             return new Response(
                 201,
                 [],

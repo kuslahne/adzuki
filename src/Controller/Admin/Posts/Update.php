@@ -51,6 +51,7 @@ class Update implements ControllerInterface
         $categoryId = (int)$params['category'];
         $tags = $params['tag'];
         $oldTags = $params['tag_ori'];
+        $metaDesc = $params['description'] ?? '';
 
 		$errors = $this->checkParams($title, $content, $tags);
 		
@@ -71,7 +72,6 @@ class Update implements ControllerInterface
 		);
 
         if (!empty($errors)) {
-			
             return new Response(
                 400,
                 [],
@@ -80,7 +80,7 @@ class Update implements ControllerInterface
         }
 
         try {
-            $this->posts->update($id, $published, $title, $content, $slug, $categoryId, $tags, $oldTags);
+            $this->posts->update($id, $published, $title, $content, $slug, $categoryId, $tags, $oldTags, $metaDesc);
             return new Response(
                 200,
                 [],

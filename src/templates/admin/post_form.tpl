@@ -43,6 +43,11 @@
 		<label for="category">Tags:</label>
 		<input type="text" class="form-control text  ui-autocomplete-input" id="postTag" name="tag" value="{{ tags }}" placeholder="Comma separated values" autocomplete="off">
 	  </div>
+    <div class="mb-3">
+		<label for="category">Meta description (optional):</label>
+        <textarea id="metaDesc" class="form-control" name="description" rows="3" cols="20" placeholder="If leave empty we will excerpt it from the content below">{{#if postEdit }}{{post.meta_desc}}{{/if}}</textarea>
+    </div>
+
 	  <div class="mb-3">
 			<label for="content" class="form-label">Content</label>
 			<div id="content" name="content" class="form-control {{#if formErrors.content}}is-invalid{{/if}}" aria-describedby="contentHelp" required></div>
